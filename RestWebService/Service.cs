@@ -357,105 +357,74 @@ namespace RestWebService
                     operations.AddCliente(clie);
                 }
                 #endregion
-
-                #region Categoria
-                else if (request_instance == "categoria")
+                #region Cuenta
+                else if (request_instance == "cuenta")
                 {
-                    BancaTec.Categoria cat = new BancaTec.Categoria(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddCategoria(cat);
-                }
-                #endregion
-                #region Compra
-                else if (request_instance == "compra")
-                {
-                    if (context.Request["productos"] == null || context.Request["cantidad"] == null)
+                    BancaTec.Cuenta cuen = new BancaTec.Cuenta
                     {
-                        BancaTec.Compra com = new BancaTec.Compra(context);
-                        //L3MDB.Empleado emp = Deserialize(PostData);                
-                        // Insert data in database
-                        operations.AddCompra(com);
-                    }
-                    else
+                        Tipo= context.Request["tipo"],
+                        Moneda = context.Request["moneda"],
+                        Descripcion = context.Request["descripcion"],
+                        CedCliente = context.Request["cedcliente"]
+                    };
+                    operations.AddCuenta(cuen);
+                }
+                #endregion
+                #region Pago
+                else if (request_instance == "pago")
+                {
+                    BancaTec.Pago pag = new BancaTec.Pago
                     {
-                        BancaTec.Compra com = new BancaTec.Compra(context);
-                        operations.AddCompraProductos(com, context);
-                    }
+                        Monto = long.Parse(context.Request["monto"]),
+                        NumPrestamo = int.Parse(context.Request["numprestamo"]),
+                        Fecha = DateTime.Parse(context.Request["fecha"]),
+                        Tipo = context.Request["tipo"],
+                        CedCliente = context.Request["cedcliente"]
+                    };
+                    operations.AddPago(pag);
                 }
                 #endregion
-                #region Horas
-                else if (request_instance == "horas")
+                #region Prestamo
+                else if (request_instance == "prestamo")
                 {
-                    BancaTec.Horas hor = new BancaTec.Horas(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddHoras(hor);
+                    BancaTec.Prestamo pres = new BancaTec.Prestamo
+                    {
+                        Interes = double.Parse(context.Request["interes"]),
+                        SaldoOrig = long.Parse(context.Request["saldoorig"]),
+                        SaldoActual = long.Parse(context.Request["saldoactual"]),
+                        CedCliente = context.Request["cedcliente"],
+                        CedAsesor = context.Request["cedasesor"],
+                        Numero = int.Parse(context.Request["numero"])
+                    };
+                    operations.AddPrestamo(pres);
                 }
                 #endregion
-                #region Producto
-                else if (request_instance == "producto")
+                #region Tarjeta
+                else if (request_instance == "tarjeta")
                 {
-                    BancaTec.Producto produ = new BancaTec.Producto(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddProducto(produ);
+                    BancaTec.Tarjeta tarj = new BancaTec.Tarjeta
+                    {
+                        CodigoSeg = context.Request["codigoseg"],
+                        FechaExp = DateTime.Parse(context.Request["fechaexp"]),
+                        Saldo = long.Parse(context.Request["saldo"]),
+                        Tipo = context.Request["tipo"],
+                        NumCuenta = int.Parse(context.Request["numcuenta"]),
+                        Numero = int.Parse(context.Request["numero"])
+                    };
+                    operations.AddTarjeta(tarj);
                 }
                 #endregion
-                #region Productos_en_compra
-                else if (request_instance == "productos_en_compra")
-                {
-                    BancaTec.Productos_en_compra producom = new BancaTec.Productos_en_compra(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddProductocompra(producom);
-                }
-                #endregion
-                #region Productos_en_venta
-                else if (request_instance == "productos_en_venta")
-                {
-                    BancaTec.Productos_en_venta produven = new BancaTec.Productos_en_venta(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddProductoventa(produven);
-                }
-                #endregion
-                #region Proveedor
-                else if (request_instance == "proveedor")
-                {
-                    BancaTec.Proveedor prove = new BancaTec.Proveedor(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddProveedor(prove);
-                }
-                #endregion
-                /*
                 #region Rol
                 else if (request_instance == "rol")
                 {
-                    BancaTec.Rol rol = new BancaTec.Rol(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
+                    BancaTec.Rol rol = new BancaTec.Rol
+                    {
+                        Nombre = context.Request["nombre"],
+                        Descripcion = context.Request["descripcion"]
+                    };
                     operations.AddRol(rol);
                 }
                 #endregion
-    */
-                #region Venta
-                else if (request_instance == "venta")
-                {
-                    if (context.Request["productos"] == null || context.Request["cantidad"] == null)
-                    {
-                        BancaTec.Venta ven = new BancaTec.Venta(context);
-                        //L3MDB.Empleado emp = Deserialize(PostData);                
-                        // Insert data in database
-                        operations.AddVenta(ven);
-                    }
-                    else
-                    {
-                        operations.AddVentaProductos(context);
-                    }
-                }
-                #endregion               
             }
             catch (Exception ex)
             {
@@ -475,117 +444,111 @@ namespace RestWebService
         {           
             try
             {
-                #region Empleado
-                if (request_instance == "empleado")
+                #region Asesor
+                if (request_instance == "asesor")
                 {
-                    BancaTec.Empleado emp = new BancaTec.Empleado(context);
-                    operations.UpdateEmpleado(emp);
-                    context.Response.Write("Employee Updtated Sucessfully");
-                    WriteResponse("oka");
-                }
-                #endregion
-                #region Sucursal
-                if (request_instance == "sucursal")
-                {
-                    BancaTec.Sucursal suc = new BancaTec.Sucursal(context);
-                    operations.UpdateSucursal(suc);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Categoria
-                if (request_instance == "categoria")
-                {
-                    BancaTec.Categoria cat = new BancaTec.Categoria(context);
-                    operations.UpdateCategoria(cat);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Compra
-                if (request_instance == "compra")
-                {
-                    BancaTec.Compra com = new BancaTec.Compra(context);
-                    operations.UpdateCompra(com);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Horas
-                if (request_instance == "horas")
-                {
-                    BancaTec.Horas hor = new BancaTec.Horas(context);
-                    operations.UpdateHoras(hor);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Producto
-                if (request_instance == "producto")
-                {
-                    BancaTec.Producto produ = new BancaTec.Producto(context);
-                    operations.UpdateProducto(produ);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Productos_en_compra
-                if (request_instance == "productos_en_compra")
-                {
-                    string listaproductosconComas = context.Request["Productos"];
-                    string listacantidadesconComas = context.Request["Cantidad"];
-                    if (listaproductosconComas == null)
+                    BancaTec.Asesor ase = new BancaTec.Asesor
                     {
-                        BancaTec.Productos_en_compra producom = new BancaTec.Productos_en_compra(context);
-                        operations.UpdateProductocompra(producom);
-                    }
-                    else
+                        Cedula = context.Request["cedula"],
+                        FechaNac = DateTime.Parse(context.Request["fechanac"]),
+                        Nombre = context.Request["nombre"],
+                        SegNombre = context.Request["segnombre"],
+                        PriApellido = context.Request["priapellido"],
+                    };
+                    operations.UpdateAsesor(ase);
+                    context.Response.Write("Asesor Updated Sucessfully");
+                    WriteResponse("ok");
+                }
+                #endregion
+                #region Cliente
+                if (request_instance == "cliente")
+                {
+                    BancaTec.Cliente clie = new BancaTec.Cliente
                     {
-                        string codigo_compra_temp = context.Request["codigo_compra"];
-                        int codigo_compra = int.Parse(codigo_compra_temp);
-                        string[] listaProductosSeparados = listaproductosconComas.Split(',');
-                        string[] listaCantidadesSeparadas = listacantidadesconComas.Split(',');
-                        for (int i = 0; i < listaProductosSeparados.Length; i++)
-                        {
-                            BancaTec.Productos_en_compra produCompModificar = new BancaTec.Productos_en_compra();
-                            int codigo_producto = int.Parse(listaProductosSeparados[i]);
-                            int cantidad = int.Parse(listaCantidadesSeparadas[i]);
-                            produCompModificar.Cantidad = cantidad;
-                            produCompModificar.Codigo_compra = codigo_compra;
-                            produCompModificar.Codigo_producto = codigo_producto;
-                            operations.UpdateProductocompra(produCompModificar);
-                        }
-                    }
-                    
+                        Nombre = context.Request["nombre"],
+                        SegundoNombre = context.Request["segundonombre"],
+                        PriApellido = context.Request["priapellido"],
+                        SegApellido = context.Request["segapellido"],
+                        Cedula = context.Request["cedula"],
+                        Tipo = context.Request["tipo"],
+                        Direccion = context.Request["direccion"],
+                        Telefono = context.Request["telefono"],
+                        Ingreso = int.Parse(context.Request["ingreso"])
+                    };
+                    operations.UpdateSucursal(clie);
                     WriteResponse("ok");
                 }
                 #endregion
-                #region Productos_en_venta
-                if (request_instance == "productos_en_venta")
+                #region Cuenta
+                else if (request_instance == "cuenta")
                 {
-                    BancaTec.Productos_en_venta produven = new BancaTec.Productos_en_venta(context);
-                    operations.UpdateProductoventa(produven);
+                    BancaTec.Cuenta cuen = new BancaTec.Cuenta
+                    {
+                        Tipo = context.Request["tipo"],
+                        Moneda = context.Request["moneda"],
+                        Descripcion = context.Request["descripcion"],
+                        CedCliente = context.Request["cedcliente"]
+                    };
+                    operations.UpdateCuenta(cuen);
                     WriteResponse("ok");
                 }
                 #endregion
-                #region Proveedor
-                if (request_instance == "proveedor")
+                #region Pago
+                else if (request_instance == "pago")
                 {
-                    BancaTec.Proveedor prove = new BancaTec.Proveedor(context);
-                    operations.UpdateProveedor(prove);
+                    BancaTec.Pago pag = new BancaTec.Pago
+                    {
+                        Monto = long.Parse(context.Request["monto"]),
+                        NumPrestamo = int.Parse(context.Request["numprestamo"]),
+                        Fecha = DateTime.Parse(context.Request["fecha"]),
+                        Tipo = context.Request["tipo"],
+                        CedCliente = context.Request["cedcliente"]
+                    };
+                    operations.UpdatePago(pag);
                     WriteResponse("ok");
                 }
                 #endregion
-                /*
+                #region Prestamo
+                else if (request_instance == "prestamo")
+                {
+                    BancaTec.Prestamo pres = new BancaTec.Prestamo
+                    {
+                        Interes = double.Parse(context.Request["interes"]),
+                        SaldoOrig = long.Parse(context.Request["saldoorig"]),
+                        SaldoActual = long.Parse(context.Request["saldoactual"]),
+                        CedCliente = context.Request["cedcliente"],
+                        CedAsesor = context.Request["cedasesor"],
+                        Numero = int.Parse(context.Request["numero"])
+                    };
+                    operations.UpdatePrestamo(pres);
+                    WriteResponse("ok");
+                }
+                #endregion
+                #region Tarjeta
+                else if (request_instance == "tarjeta")
+                {
+                    BancaTec.Tarjeta tarj = new BancaTec.Tarjeta
+                    {
+                        CodigoSeg = context.Request["codigoseg"],
+                        FechaExp = DateTime.Parse(context.Request["fechaexp"]),
+                        Saldo = long.Parse(context.Request["saldo"]),
+                        Tipo = context.Request["tipo"],
+                        NumCuenta = int.Parse(context.Request["numcuenta"]),
+                        Numero = int.Parse(context.Request["numero"])
+                    };
+                    operations.UpdateTarjeta(tarj);
+                    WriteResponse("ok");
+                }
+                #endregion
                 #region Rol
-                if (request_instance == "rol")
+                else if (request_instance == "rol")
                 {
-                    BancaTec.Rol rol = new BancaTec.Rol(context);
+                    BancaTec.Rol rol = new BancaTec.Rol
+                    {
+                        Nombre = context.Request["nombre"],
+                        Descripcion = context.Request["descripcion"]
+                    };
                     operations.UpdateRol(rol);
-                    WriteResponse("ok");
-                }
-                #endregion
-    */
-                #region Venta
-                if (request_instance == "venta")
-                {
-                    BancaTec.Venta ven = new BancaTec.Venta(context);
-                    operations.UpdateVenta(ven);
                     WriteResponse("ok");
                 }
                 #endregion
