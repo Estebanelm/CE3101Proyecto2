@@ -14,15 +14,12 @@ namespace RestWebService
         #region Private Members
 
         //Estos miembros están presentes para evitar repetición de declaracione dentro de las funciones
-        private BancaTec.Empleado emp;
-        private BancaTec.Sucursal suc;
-        private BancaTec.Categoria cat;
-        private BancaTec.Compra com;
-        private BancaTec.Venta ven;
+        private BancaTec.Asesor ase;
+        private BancaTec.Cliente clie;
+        private BancaTec.Cuenta cuen;
+        private BancaTec.Prestamo prest;
+        private BancaTec.Tarjeta tarje;
         private BancaTec.Producto produ;
-        private BancaTec.Productos_en_compra producom;
-        private BancaTec.Productos_en_venta produven;
-        private BancaTec.Proveedor prove;
         //private BancaTec.Rol rol;
         private Operations.Operations operations;
         private string connString; //string con los parámetros de conexión hacia la base de datos
@@ -124,312 +121,165 @@ namespace RestWebService
             //Formato de la forma de hacer el request
             try
             {
-                #region Empleado
-                if (request_instance == "empleado")
+                #region Asesor
+                if (request_instance == "asesor")
                 {
                     string _cedula_temp = context.Request["cedula"]; //obtiene el valor del parámetro cedula
                     if (_cedula_temp == null) //si no hay parámetro, obtener todos los empleados
                     {
-                        List<BancaTec.Empleado> lista_empleados = operations.GetEmpleados();
-                        string serializedList = Serialize(lista_empleados);
+                        List<BancaTec.Asesor> lista_asesores = operations.GetAsesores();
+                        string serializedList = Serialize(lista_asesores);
                         context.Response.ContentType = "text/xml";
                         WriteResponse(serializedList);
-
                     }
                     else //si hay parámetro cedula, obtener solo 1 empleado
                     {
-                        int _cedula = int.Parse(_cedula_temp);
-                        emp = operations.GetEmpleado(_cedula);
-                        if (emp == null)
-                            context.Response.Write("No Empleado Found" + context.Request["cedula"]);
+                        string _cedula = _cedula_temp;
+                        ase = operations.GetAsesor(_cedula);
+                        if (ase == null)
+                            context.Response.Write("No Asesor Found: " + context.Request["cedula"]);
 
-                        string serializedEmpleado = Serialize(emp);
+                        string serializedAsesor = Serialize(ase);
                         context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedEmpleado);
+                        WriteResponse(serializedAsesor);
                     }
                 }
                 #endregion
-                #region Sucursal
-                else if (request_instance == "sucursal")
+                #region Cliente
+                else if (request_instance == "cliente")
                 {
-                    string _codigo_temp = context.Request["codigo"];
-                    if (_codigo_temp == null)
+                    string cedula_temp = context.Request["cedula"];
+                    if (cedula_temp == null)
                     {
-                        List<BancaTec.Sucursal> lista_sucursales = operations.GetSucursales();
-                        string serializedList = Serialize(lista_sucursales);
+                        List<BancaTec.Cliente> lista_clientes = operations.GetClientes();
+                        string serializedList = Serialize(lista_clientes);
                         context.Response.ContentType = "text/xml";
                         WriteResponse(serializedList);
 
                     }
                     else
                     {
-                        string _codigo = _codigo_temp;
-                        suc = operations.GetSucursal(_codigo);
-                        if (suc == null)
-                            context.Response.Write(_codigo + "No Sucursal Found" + context.Request["codigo"]);
+                        string _cedula = cedula_temp;
+                        clie = operations.GetSucursal(_cedula);
+                        if (clie == null)
+                            context.Response.Write(_cedula + "No Cliente Found" + context.Request["cedula"]);
 
-                        string serializedSucursal = Serialize(suc);
+                        string serializedCliente = Serialize(clie);
                         context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedSucursal);
+                        WriteResponse(serializedCliente);
                     }
                 }
                 #endregion
-                #region Categoria
-                else if (request_instance == "categoria")
+                #region Cuenta
+                else if (request_instance == "cuenta")
                 {
-                    string _id_temp = context.Request["id"];
-                    if (_id_temp == null)
+                    string num_temp = context.Request["numcuenta"];
+                    if (num_temp == null)
                     {
-                        List<BancaTec.Categoria> lista_categorias= operations.GetCategorias();
-                        string serializedList = Serialize(lista_categorias);
+                        List<BancaTec.Cuenta> lista_cuentas= operations.GetCuentas();
+                        string serializedList = Serialize(lista_cuentas);
                         context.Response.ContentType = "text/xml";
                         WriteResponse(serializedList);
 
                     }
                     else
                     {
-                        int _id = int.Parse(_id_temp);
+                        int _num = int.Parse(num_temp);
 
                         //HTTP Request Type - GET"
                         //Performing Operation - READ"
-                        cat = operations.GetCategoria(_id);
-                        if (cat == null)
-                            context.Response.Write(_id + "No Categoria Found" + _id_temp);
+                        cuen = operations.GetCuenta(_num);
+                        if (cuen == null)
+                            context.Response.Write(_num + "No Cuenta Found" + num_temp);
 
-                        string serializedCategoria = Serialize(cat);
+                        string serializedCuenta = Serialize(cuen);
                         context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedCategoria);
+                        WriteResponse(serializedCuenta);
                     }
                 }
                 #endregion
-                #region Compra
-                else if (request_instance == "compra")
+                #region Pago
+                else if (request_instance == "cuenta")
                 {
-                    string _codigotemp = context.Request["codigo"];
-                    string _fecha_inicial = context.Request["fecha_inicial"];
-                    string _fecha_final = context.Request["fecha_final"];
-                    string _codigo_sucursal = context.Request["codigo_sucursal"];
-                    if (_codigotemp == null)
+                    string num_prestamo_temp = context.Request["numprestamo"];
+                    string ced_cliente_temp = context.Request["cedcliente"];
+                    List<BancaTec.Pago> lista_pagos = new List<BancaTec.Pago>();
+                    if (num_prestamo_temp == null && ced_cliente_temp != null)
                     {
-                        if (_codigo_sucursal == null)
-                        {
-                            if (_fecha_inicial != null && _fecha_final != null)
-                            {
-                                List<Operations.Gasto> lista_compras = operations.GetGastos("", _fecha_inicial, _fecha_final);
-                                string serializedList = Serialize(lista_compras);
-                                context.Response.ContentType = "text/xml";
-                                WriteResponse(serializedList);
-                            }
-                            else
-                            {
-                                List<BancaTec.Compra> lista_compras = operations.GetCompras();
-                                string serializedList = Serialize(lista_compras);
-                                context.Response.ContentType = "text/xml";
-                                WriteResponse(serializedList);
-                            }
-                        }
-                        else
-                        {
-                            if (_fecha_inicial != null && _fecha_final != null)
-                            {
-                                List<Operations.Gasto> lista_compras = operations.GetGastos(_codigo_sucursal, _fecha_inicial, _fecha_final);
-                                string serializedList = Serialize(lista_compras);
-                                context.Response.ContentType = "text/xml";
-                                WriteResponse(serializedList);
-                            }
-                            else
-                            {
-                                List<BancaTec.Compra> lista_compras = operations.GetCompras();
-                                string serializedList = Serialize(lista_compras);
-                                context.Response.ContentType = "text/xml";
-                                WriteResponse(serializedList);
-                            }
-                        }
-                        
-
+                        int ced_cliente = int.Parse(ced_cliente_temp);
+                        lista_pagos = operations.GetPagos(ced_cliente, "cliente");
+                    }
+                    else if (num_prestamo_temp !=null)
+                    {
+                        int num_prestamo = int.Parse(num_prestamo_temp);
+                        lista_pagos = operations.GetPagos(num_prestamo, "prestamo");
                     }
                     else
                     {
-                        int _codigo = int.Parse(_codigotemp);
-
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
-                        com = operations.GetCompra(_codigo);
-                        if (com == null)
-                            context.Response.Write(_codigo + "No Compra Found" + _codigotemp);
-
-                        string serializedCompra = Serialize(com);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedCompra);
+                        lista_pagos = operations.GetPagos();
                     }
+                    if (lista_pagos == null)
+                        context.Response.Write("No Pagos Found");
+                    string serializedList = Serialize(lista_pagos);
+                    context.Response.ContentType = "text/xml";
+                    WriteResponse(serializedList);
                 }
                 #endregion
-                #region Horas
-                else if (request_instance == "horas")
+                #region Prestamo
+                else if (request_instance == "prestamo")
                 {
-                    string _horastemp = context.Request["id_semana"];
-                    if (_horastemp == null)
+                    string num_temp = context.Request["numero"];
+                    if (num_temp == null)
                     {
-                        List<BancaTec.Horas> lista_horas = operations.GetHorases();
-                        string serializedList = Serialize(lista_horas);
+                        List<BancaTec.Prestamo> lista_prestamos = operations.GetPrestamos();
+                        string serializedList = Serialize(lista_prestamos);
                         context.Response.ContentType = "text/xml";
                         WriteResponse(serializedList);
 
                     }
                     else
                     {
-                        string _horas = _horastemp;
-                        List<BancaTec.Horas> listaHorasSemana = new List<BancaTec.Horas>();
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
-                        listaHorasSemana = operations.GetHoras(_horas);
-                        if (listaHorasSemana.Count == 0)
-                            context.Response.Write(_horas + "No Horas Found" + _horastemp);
-
-                        string serializedHoras = Serialize(listaHorasSemana);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedHoras);
-                    }
-                }
-                #endregion
-                #region Producto
-                else if (request_instance == "producto")
-                {
-                    string _codigo_barrastemp = context.Request["codigo_barras"];
-                    string _codigo_sucursaltemp = context.Request["codigo_sucursal"];
-                    string _todos = context.Request["Todos"];
-                    if (_codigo_barrastemp == null)
-                    {
-                        if (_codigo_sucursaltemp == null)
-                        {
-                            if (_todos == null)
-                            {
-                                List<BancaTec.Producto> lista_productos = operations.GetProductos();
-                                string serializedList = Serialize(lista_productos);
-                                context.Response.ContentType = "text/xml";
-                                WriteResponse(serializedList);
-                            }
-                            else
-                            {
-                                List<Operations.ReporteProductos> lista_productos = operations.GetProductosTodos();
-                                string serializedList = Serialize(lista_productos);
-                                context.Response.ContentType = "text/xml";
-                                WriteResponse(serializedList);
-                            }
-                        }
-                        else
-                        {
-                            List<Operations.ReporteProductosSucursal> lista_productos = operations.GetProductosporSucursal(_codigo_sucursaltemp);
-                            string serializedList = Serialize(lista_productos);
-                            context.Response.ContentType = "text/xml";
-                            WriteResponse(serializedList);
-                        }
-                    }
-                    else
-                    {
-                        int _codigo_barras = int.Parse(_codigo_barrastemp);
+                        int _num = int.Parse(num_temp);
 
                         //HTTP Request Type - GET"
                         //Performing Operation - READ"
-                        produ = operations.GetProducto(_codigo_barras, _codigo_sucursaltemp);
-                        if (produ == null)
-                            context.Response.Write(_codigo_barras + "No Producto Found" + _codigo_barrastemp);
+                        prest = operations.GetPrestamo(_num);
+                        if (prest == null)
+                            context.Response.Write(_num + "No Cuenta Found" + num_temp);
 
-                        string serializedProducto = Serialize(produ);
+                        string serializedPrestamo = Serialize(prest);
                         context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedProducto);
+                        WriteResponse(serializedPrestamo);
                     }
                 }
                 #endregion
-                #region Productos_en_compra
-                else if (request_instance == "productos_en_compra")
+                #region Tarjeta
+                else if (request_instance == "tarjeta")
                 {
-                    string _codigo_compratemp = context.Request["codigo_compra"];
-                    string _codigo_productotemp = context.Request["codigo_producto"];
-                    if (_codigo_compratemp == null)
+                    string _numtemp = context.Request["numero"];
+                    if (_numtemp == null)
                     {
-                        List<BancaTec.Productos_en_compra> lista_productos_en_compra = operations.GetProductos_en_compras();
-                        string serializedList = Serialize(lista_productos_en_compra);
+                        List<BancaTec.Tarjeta> lista_tarjetas = operations.GetTarjetas();
+                        string serializedList = Serialize(lista_tarjetas);
                         context.Response.ContentType = "text/xml";
                         WriteResponse(serializedList);
 
                     }
                     else
                     {
-                        int _codigo_compra = int.Parse(_codigo_compratemp);
-                        int _codigo_producto = int.Parse(_codigo_productotemp);
-
+                        int _num = int.Parse(_numtemp);
                         //HTTP Request Type - GET"
                         //Performing Operation - READ"
-                        producom = operations.GetProducto_en_compra(_codigo_compra, _codigo_producto);
-                        if (producom == null)
-                            context.Response.Write(_codigo_compra + "No Producto Found" + _codigo_compratemp);
+                        tarje = operations.GetTarjeta(_num);
+                        if (tarje == null)
+                            context.Response.Write(_num + "No Tarjeta Found" + _numtemp);
 
-                        string serializedProductos_en_compra = Serialize(producom);
+                        string serializedTarjeta = Serialize(tarje);
                         context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedProductos_en_compra);
+                        WriteResponse(serializedTarjeta);
                     }
                 }
                 #endregion
-                #region Productos_en_venta
-                else if (request_instance == "productos_en_venta")
-                {
-                    string _codigo_ventatemp = context.Request["codigo_venta"];
-                    string _codigo_productotemp = context.Request["codigo_producto"];
-                    if (_codigo_ventatemp == null)
-                    {
-                        List<BancaTec.Productos_en_venta> lista_productos_en_venta = operations.GetProductos_en_ventas();
-                        string serializedList = Serialize(lista_productos_en_venta);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
-
-                    }
-                    else
-                    {
-                        int _codigo_venta = int.Parse(_codigo_ventatemp);
-                        int _codigo_producto = int.Parse(_codigo_productotemp);
-
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
-                        produven = operations.GetProducto_en_venta(_codigo_venta, _codigo_producto);
-                        if (produven == null)
-                            context.Response.Write(_codigo_venta + "No Producto Found" + _codigo_ventatemp);
-
-                        string serializedProductos_en_venta = Serialize(produven);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedProductos_en_venta);
-                    }
-                }
-                #endregion
-                #region Proveedor
-                else if (request_instance == "proveedor")
-                {
-                    string _cedulatemp = context.Request["cedula"];
-                    if (_cedulatemp == null)
-                    {
-                        List<BancaTec.Proveedor> lista_proveedores = operations.GetProveedores();
-                        string serializedList = Serialize(lista_proveedores);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
-
-                    }
-                    else
-                    {
-                        int _cedula = int.Parse(_cedulatemp);
-
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
-                        prove = operations.GetProveedor(_cedula);
-                        if (prove == null)
-                            context.Response.Write(_cedula + "No Producto Found" + _cedulatemp);
-
-                        string serializedProveedor = Serialize(prove);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedProveedor);
-                    }
-                }
-                #endregion
-                /*
                 #region Rol
                 else if (request_instance == "rol")
                 {
@@ -450,40 +300,11 @@ namespace RestWebService
                         //Performing Operation - READ"
                         rol = operations.GetRol(nombre);
                         if (rol == null)
-                            context.Response.Write(nombre + "No Producto Found" + nombretemp);
+                            context.Response.Write(nombre + "No Rol Found" + nombretemp);
 
                         string serializedRol = Serialize(rol);
                         context.Response.ContentType = "text/xml";
                         WriteResponse(serializedRol);
-                    }
-                }
-                #endregion
-    */
-                #region Venta
-                else if (request_instance == "venta")
-                {
-                    string _codigotemp = context.Request["codigo"];
-                    if (_codigotemp == null)
-                    {
-                        List<BancaTec.Venta> lista_ventas = operations.GetVentas();
-                        string serializedList = Serialize(lista_ventas);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
-
-                    }
-                    else
-                    {
-                        int _codigo = int.Parse(_codigotemp);
-
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
-                        ven = operations.GetVenta(_codigo);
-                        if (ven == null)
-                            context.Response.Write(_codigo + "No Producto Found" + _codigotemp);
-
-                        string serializedVenta = Serialize(ven);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedVenta);
                     }
                 }
                 #endregion
@@ -506,22 +327,37 @@ namespace RestWebService
         {
             try
             {
-                #region Empleado
-                if (request_instance == "empleado")
+                #region Asesor
+                if (request_instance == "asesor")
                 {
-                    BancaTec.Empleado emp = new BancaTec.Empleado(context);
-                    operations.AddEmpleado(emp);
+                    BancaTec.Asesor ase = new BancaTec.Asesor {
+                        Cedula = context.Request["cedula"],
+                        FechaNac = DateTime.Parse(context.Request["fechanac"]),
+                        Nombre = context.Request["nombre"],
+                        SegNombre = context.Request["segnombre"],
+                        PriApellido = context.Request["priapellido"],};
+                    operations.AddAsesor(ase);
                 }
                 #endregion
-                #region Sucursal
-                else if (request_instance == "sucursal")
+                #region Cliente
+                else if (request_instance == "cliente")
                 {
-                    BancaTec.Sucursal suc = new BancaTec.Sucursal(context);
-                    //L3MDB.Empleado emp = Deserialize(PostData);                
-                    // Insert data in database
-                    operations.AddSucursal(suc);
+                    BancaTec.Cliente clie = new BancaTec.Cliente
+                    {
+                        Nombre = context.Request["nombre"],
+                        SegundoNombre = context.Request["segundonombre"],
+                        PriApellido = context.Request["priapellido"],
+                        SegApellido = context.Request["segapellido"],
+                        Cedula = context.Request["cedula"],
+                        Tipo = context.Request["tipo"],
+                        Direccion = context.Request["direccion"],
+                        Telefono = context.Request["telefono"],
+                        Ingreso = int.Parse(context.Request["ingreso"])
+                    };
+                    operations.AddCliente(clie);
                 }
                 #endregion
+
                 #region Categoria
                 else if (request_instance == "categoria")
                 {
