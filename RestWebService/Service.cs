@@ -570,108 +570,64 @@ namespace RestWebService
         {
             try
             {
-                #region Empleado
-                if (request_instance == "empleado")
+                #region Asesor
+                if (request_instance == "asesor")
                 {
                     string _cedula_temp = context.Request["cedula"];
-                    int _cedula = int.Parse(_cedula_temp);
-                    operations.DeleteEmpleado(_cedula);
+                    operations.DeleteAsesor(_cedula_temp);
                     WriteResponse("ok");
                 }
                 #endregion
-                #region Sucursal
-                if (request_instance == "sucursal")
-                {
-                    string _codigo_temp = context.Request["codigo"];
-                    operations.DeleteSucursal(_codigo_temp);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Categoria
-                if (request_instance == "categoria")
-                {
-                    string _id_temp = context.Request["id"];
-                    int _id = int.Parse(_id_temp);
-                    operations.DeleteCategoria(_id);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Compra
-                if (request_instance == "compra")
-                {
-                    string _codigo_temp = context.Request["codigo"];
-                    int _codigo = int.Parse(_codigo_temp);
-                    operations.DeleteCompra(_codigo);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Horas
-                if (request_instance == "horas")
-                {
-                    string _id_semana = context.Request["id_semana"];
-                    string _cedempleado_temp = context.Request["ced_empleado"];
-                    int _cedempleado = int.Parse(_cedempleado_temp);
-                    operations.DeleteHoras(_id_semana, _cedempleado);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Producto
-                if (request_instance == "producto")
-                {
-                    string _codigo_barras_temp = context.Request["codigo_barras"];
-                    int _codigo_barras = int.Parse(_codigo_barras_temp);
-                    string _codigo_sucursal = context.Request["codigo_sucursal"];
-                    operations.DeleteProducto(_codigo_barras, _codigo_sucursal);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Productos_en_compra
-                if (request_instance == "productos_en_compra")
-                {
-                    string _codigo_compra_temp = context.Request["codigo_compra"];
-                    string _codigo_productotemp = context.Request["codigo_producto"];
-                    int _codigo_compra = int.Parse(_codigo_compra_temp);
-                    int _codigo_producto = int.Parse(_codigo_productotemp);
-                    operations.DeleteProductocompra(_codigo_compra, _codigo_producto);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Productos_en_venta
-                if (request_instance == "productos_en_venta")
-                {
-                    string _codigo_venta_temp = context.Request["codigo_venta"];
-                    string _codigo_productotemp = context.Request["codigo_producto"];
-                    int _codigo_venta = int.Parse(_codigo_venta_temp);
-                    int _codigo_producto = int.Parse(_codigo_productotemp);
-                    operations.DeleteProductoventa(_codigo_venta, _codigo_producto);
-                    WriteResponse("ok");
-                }
-                #endregion
-                #region Proveedor
-                if (request_instance == "proveedor")
+                #region Cliente
+                if (request_instance == "cliente")
                 {
                     string _cedula_temp = context.Request["cedula"];
-                    int _cedula = int.Parse(_cedula_temp);
-                    operations.DeleteProveedor(_cedula);
+                    operations.DeleteCliente(_cedula_temp);
                     WriteResponse("ok");
                 }
                 #endregion
-                /*
+                #region Cuenta
+                if (request_instance == "cuenta")
+                {
+                    string _num_temp = context.Request["numcuenta"];
+                    int _num = int.Parse(_num_temp);
+                    operations.DeleteCuenta(_num);
+                    WriteResponse("ok");
+                }
+                #endregion
+                #region Pago
+                if (request_instance == "pago")
+                {
+                    string _cedcliente_temp = context.Request["cedcliente"];
+                    string _numprest_temp = context.Request["numprestamo"];
+                    int _numprest = int.Parse(_numprest_temp);
+                    operations.DeletePago(_cedcliente_temp, _numprest);
+                    WriteResponse("ok");
+                }
+                #endregion
+                #region Prestamo
+                if (request_instance == "prestamo")
+                {
+                    string _numero_temp = context.Request["numero"];
+                    int _numero = int.Parse(_numero_temp);
+                    operations.DeletePrestamo(_numero);
+                    WriteResponse("ok");
+                }
+                #endregion
+                #region Tarjeta
+                if (request_instance == "tarjeta")
+                {
+                    string _numero_temp = context.Request["numero"];
+                    int _numero = int.Parse(_numero_temp);
+                    operations.DeleteTarjeta(_numero);
+                    WriteResponse("ok");
+                }
+                #endregion
                 #region Rol
                 if (request_instance == "rol")
                 {
-                    string nombre = context.Request["nombre"];
-                    operations.DeleteRol(nombre);
-                    WriteResponse("ok");
-                }
-                #endregion
-    */
-                #region Venta
-                if (request_instance == "venta")
-                {
-                    string _codigo_temp = context.Request["codigo"];
-                    int _codigo = int.Parse(_codigo_temp);
-                    operations.DeleteVenta(_codigo);
+                    string _nombre_temp = context.Request["nombre"];
+                    operations.DeleteRol(_nombre_temp);
                     WriteResponse("ok");
                 }
                 #endregion
