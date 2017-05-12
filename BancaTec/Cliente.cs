@@ -20,8 +20,9 @@ namespace BancaTec
         public string Tipo { get; set; }
         public string Direccion { get; set; }
         public string Telefono { get; set; }
-        public int Ingreso { get; set; }
+        public decimal Ingreso { get; set; }
         public char Estado { get; set; }
+        public string Contraseña { get; set; }
 
         public virtual ICollection<Cuenta> Cuenta { get; set; }
         public virtual ICollection<Pago> Pago { get; set; }

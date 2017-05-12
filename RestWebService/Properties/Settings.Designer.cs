@@ -26,8 +26,7 @@ namespace RestWebService.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=SYNPUNEHCRV-105\\SQLEXPRESS;Initial Catalog=Company;Integrated Securit" +
-            "y=True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017")]
         public string ConnectionString {
             get {
                 return ((string)(this["ConnectionString"]));

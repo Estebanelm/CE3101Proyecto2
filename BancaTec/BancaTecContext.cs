@@ -7,12 +7,18 @@ namespace BancaTec
     public partial class BancaTecContext : DbContext
     {
         public virtual DbSet<Asesor> Asesor { get; set; }
+        public virtual DbSet<CancelarTarjeta> CancelarTarjeta { get; set; }
         public virtual DbSet<Cliente> Cliente { get; set; }
+        public virtual DbSet<Compra> Compra { get; set; }
         public virtual DbSet<Cuenta> Cuenta { get; set; }
+        public virtual DbSet<Empleado> Empleado { get; set; }
+        public virtual DbSet<EmpleadoRol> EmpleadoRol { get; set; }
+        public virtual DbSet<Movimiento> Movimiento { get; set; }
         public virtual DbSet<Pago> Pago { get; set; }
         public virtual DbSet<Prestamo> Prestamo { get; set; }
         public virtual DbSet<Rol> Rol { get; set; }
         public virtual DbSet<Tarjeta> Tarjeta { get; set; }
+        public virtual DbSet<Transferencia> Transferencia { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,9 +38,15 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
-                entity.Property(e => e.Estado).HasColumnType("char");
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
 
                 entity.Property(e => e.FechaNac).HasColumnType("date");
+
+                entity.Property(e => e.MetaColones).HasColumnType("money");
+
+                entity.Property(e => e.MetaDolares).HasColumnType("money");
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
@@ -56,6 +68,23 @@ namespace BancaTec
                     .HasMaxLength(15);
             });
 
+            modelBuilder.Entity<CancelarTarjeta>(entity =>
+            {
+                entity.ToTable("CANCELAR_TARJETA");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Fecha).HasColumnType("date");
+
+                entity.Property(e => e.Monto).HasColumnType("money");
+
+                entity.HasOne(d => d.NumTarjetaNavigation)
+                    .WithMany(p => p.CancelarTarjeta)
+                    .HasForeignKey(d => d.NumTarjeta)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("TarjetaConstraint");
+            });
+
             modelBuilder.Entity<Cliente>(entity =>
             {
                 entity.HasKey(e => e.Cedula)
@@ -67,12 +96,21 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
+                entity.Property(e => e.Contraseña)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
                 entity.Property(e => e.Direccion)
                     .IsRequired()
                     .HasColumnType("varchar")
                     .HasMaxLength(100);
 
-                entity.Property(e => e.Estado).HasColumnType("char");
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
+
+                entity.Property(e => e.Ingreso).HasColumnType("money");
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
@@ -103,6 +141,32 @@ namespace BancaTec
                     .HasMaxLength(8);
             });
 
+            modelBuilder.Entity<Compra>(entity =>
+            {
+                entity.ToTable("COMPRA");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Comercio)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.Moneda)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(7)
+                    .HasDefaultValueSql("'Colones'::character varying");
+
+                entity.Property(e => e.Monto).HasColumnType("money");
+
+                entity.HasOne(d => d.NumTarjetaNavigation)
+                    .WithMany(p => p.Compra)
+                    .HasForeignKey(d => d.NumTarjeta)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("TarjetaConstraint");
+            });
+
             modelBuilder.Entity<Cuenta>(entity =>
             {
                 entity.HasKey(e => e.NumCuenta)
@@ -119,12 +183,19 @@ namespace BancaTec
                     .HasColumnType("varchar")
                     .HasMaxLength(100);
 
-                entity.Property(e => e.Estado).HasColumnType("char");
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
 
                 entity.Property(e => e.Moneda)
                     .IsRequired()
                     .HasColumnType("varchar")
-                    .HasMaxLength(7);
+                    .HasMaxLength(7)
+                    .HasDefaultValueSql("'Colones'::character varying");
+
+                entity.Property(e => e.Saldo)
+                    .HasColumnType("money")
+                    .HasDefaultValueSql("0");
 
                 entity.Property(e => e.Tipo)
                     .IsRequired()
@@ -135,6 +206,105 @@ namespace BancaTec
                     .WithMany(p => p.Cuenta)
                     .HasForeignKey(d => d.CedCliente)
                     .HasConstraintName("Cliente");
+            });
+
+            modelBuilder.Entity<Empleado>(entity =>
+            {
+                entity.HasKey(e => e.Cedula)
+                    .HasName("PK_EMPLEADO");
+
+                entity.ToTable("EMPLEADO");
+
+                entity.Property(e => e.Cedula)
+                    .HasColumnType("bpchar")
+                    .HasMaxLength(9);
+
+                entity.Property(e => e.Contraseña)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.Nombre)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.PriApellido)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.SegApellido)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.SegNombre)
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.Sucursal)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(20)
+                    .HasDefaultValueSql("'Cartago'::character varying");
+            });
+
+            modelBuilder.Entity<EmpleadoRol>(entity =>
+            {
+                entity.ToTable("EMPLEADO_ROL");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.CedulaEmpledo)
+                    .IsRequired()
+                    .HasColumnType("bpchar")
+                    .HasMaxLength(9);
+
+                entity.Property(e => e.NombreRol)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.CedulaEmpledoNavigation)
+                    .WithMany(p => p.EmpleadoRol)
+                    .HasForeignKey(d => d.CedulaEmpledo)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("EmpleadoReference");
+
+                entity.HasOne(d => d.NombreRolNavigation)
+                    .WithMany(p => p.EmpleadoRol)
+                    .HasForeignKey(d => d.NombreRol)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("RolReference");
+            });
+
+            modelBuilder.Entity<Movimiento>(entity =>
+            {
+                entity.ToTable("MOVIMIENTO");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Fecha).HasColumnType("date");
+
+                entity.Property(e => e.Moneda)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(7)
+                    .HasDefaultValueSql("'Colones'::character varying");
+
+                entity.Property(e => e.Monto).HasColumnType("money");
+
+                entity.Property(e => e.Tipo)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(8);
+
+                entity.HasOne(d => d.NumCuentaNavigation)
+                    .WithMany(p => p.Movimiento)
+                    .HasForeignKey(d => d.NumCuenta)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("CuentaReference");
             });
 
             modelBuilder.Entity<Pago>(entity =>
@@ -151,7 +321,18 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
+                entity.Property(e => e.Estado)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(7);
+
                 entity.Property(e => e.Fecha).HasColumnType("date");
+
+                entity.Property(e => e.Monto).HasColumnType("money");
+
+                entity.Property(e => e.MontoInteres)
+                    .HasColumnType("money")
+                    .HasDefaultValueSql("0");
 
                 entity.Property(e => e.Tipo)
                     .IsRequired()
@@ -188,7 +369,19 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
-                entity.Property(e => e.Estado).HasColumnType("char");
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
+
+                entity.Property(e => e.Moneda)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(7)
+                    .HasDefaultValueSql("'Colones'::character varying");
+
+                entity.Property(e => e.SaldoActual).HasColumnType("money");
+
+                entity.Property(e => e.SaldoOrig).HasColumnType("money");
 
                 entity.HasOne(d => d.CedAsesorNavigation)
                     .WithMany(p => p.Prestamo)
@@ -230,11 +423,17 @@ namespace BancaTec
                 entity.Property(e => e.CodigoSeg)
                     .IsRequired()
                     .HasColumnType("bpchar")
-                    .HasMaxLength(4);
+                    .HasMaxLength(3);
 
-                entity.Property(e => e.Estado).HasColumnType("char");
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
 
                 entity.Property(e => e.FechaExp).HasColumnType("date");
+
+                entity.Property(e => e.Saldo)
+                    .HasColumnType("money")
+                    .HasDefaultValueSql("0");
 
                 entity.Property(e => e.Tipo)
                     .IsRequired()
@@ -246,6 +445,35 @@ namespace BancaTec
                     .HasForeignKey(d => d.NumCuenta)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("CuentaReference");
+            });
+
+            modelBuilder.Entity<Transferencia>(entity =>
+            {
+                entity.ToTable("TRANSFERENCIA");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Fecha).HasColumnType("date");
+
+                entity.Property(e => e.Moneda)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(7)
+                    .HasDefaultValueSql("'Colones'::character varying");
+
+                entity.Property(e => e.Monto).HasColumnType("money");
+
+                entity.HasOne(d => d.CuentaEmisoraNavigation)
+                    .WithMany(p => p.TransferenciaCuentaEmisoraNavigation)
+                    .HasForeignKey(d => d.CuentaEmisora)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("EmisorReference");
+
+                entity.HasOne(d => d.CuentaReceptoraNavigation)
+                    .WithMany(p => p.TransferenciaCuentaReceptoraNavigation)
+                    .HasForeignKey(d => d.CuentaReceptora)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("ReceptorReference");
             });
         }
     }

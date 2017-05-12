@@ -19,8 +19,7 @@ namespace RestWebService
         private BancaTec.Cuenta cuen;
         private BancaTec.Prestamo prest;
         private BancaTec.Tarjeta tarje;
-        private BancaTec.Producto produ;
-        //private BancaTec.Rol rol;
+        private BancaTec.Rol rol;
         private Operations.Operations operations;
         private string connString; //string con los parámetros de conexión hacia la base de datos
         private ErrorHandler.ErrorHandler errHandler;

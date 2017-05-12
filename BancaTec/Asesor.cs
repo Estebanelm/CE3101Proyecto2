@@ -16,7 +16,9 @@ namespace BancaTec
         public string SegNombre { get; set; }
         public string PriApellido { get; set; }
         public string SegApellido { get; set; }
-        public char? Estado { get; set; }
+        public char Estado { get; set; }
+        public decimal MetaColones { get; set; }
+        public decimal MetaDolares { get; set; }
 
         public virtual ICollection<Prestamo> Prestamo { get; set; }
     }

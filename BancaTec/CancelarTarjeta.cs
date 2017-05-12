@@ -3,12 +3,11 @@ using System.Collections.Generic;
 
 namespace BancaTec
 {
-    public partial class Compra
+    public partial class CancelarTarjeta
     {
-        public int NumTarjeta { get; set; }
-        public string Comercio { get; set; }
         public decimal Monto { get; set; }
-        public string Moneda { get; set; }
+        public DateTime Fecha { get; set; }
+        public int NumTarjeta { get; set; }
         public int Id { get; set; }
 
         public virtual Tarjeta NumTarjetaNavigation { get; set; }
