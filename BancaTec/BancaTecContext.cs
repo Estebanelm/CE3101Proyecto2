@@ -22,6 +22,7 @@ namespace BancaTec
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
             optionsBuilder.UseNpgsql(@"Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017");
         }
 
@@ -96,7 +97,7 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
-                entity.Property(e => e.Contraseña)
+                entity.Property(e => e.Contrasena)
                     .IsRequired()
                     .HasColumnType("varchar")
                     .HasMaxLength(20);
@@ -219,7 +220,7 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
-                entity.Property(e => e.Contraseña)
+                entity.Property(e => e.Contrasena)
                     .IsRequired()
                     .HasColumnType("varchar")
                     .HasMaxLength(20);
@@ -326,6 +327,10 @@ namespace BancaTec
                     .HasColumnType("varchar")
                     .HasMaxLength(7);
 
+                entity.Property(e => e.Extraordinario)
+                    .HasColumnType("money")
+                    .HasDefaultValueSql("0");
+
                 entity.Property(e => e.Fecha).HasColumnType("date");
 
                 entity.Property(e => e.Monto).HasColumnType("money");
@@ -334,10 +339,7 @@ namespace BancaTec
                     .HasColumnType("money")
                     .HasDefaultValueSql("0");
 
-                entity.Property(e => e.Tipo)
-                    .IsRequired()
-                    .HasColumnType("varchar")
-                    .HasMaxLength(14);
+                entity.Property(e => e.PagosRestantes).HasDefaultValueSql("12");
 
                 entity.HasOne(d => d.CedClienteNavigation)
                     .WithMany(p => p.Pago)

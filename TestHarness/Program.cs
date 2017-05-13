@@ -25,25 +25,25 @@ namespace TestHarness
             //Sucursal suc = new Sucursal();
             //string strConnString = "Data Source=LAPTOP-2E6BHQDP\\SQLEXPRESS;Initial Catalog=L3MDB;Integrated Security=True";
             //Operations.Operations dal = new Operations.Operations(strConnString);
-            
-            using (var db = new BancaTecContext())
-            {
-                //db.Rol.Add(new Rol { Nombre = "Administrador", Descripcion = "Administra todo" });
-                //var count = db.SaveChanges();
-                //Console.WriteLine("{0} records saved to database", count);
 
-                Console.WriteLine();
-                Console.WriteLine("All roles in database:");
-                var roles = db.Cuenta
-                        .Include(blog => blog.CedClienteNavigation)
-                        .ToList();
-                foreach (var rol in db.Rol)
-                {
-                    
-                    Console.WriteLine(" - {0}", rol.Nombre);
-                }
-            }
-            
+            //using (var db = new BancaTecContext())
+            //{
+            //    //db.Rol.Add(new Rol { Nombre = "Administrador", Descripcion = "Administra todo" });
+            //    //var count = db.SaveChanges();
+            //    //Console.WriteLine("{0} records saved to database", count);
+
+            //    Console.WriteLine();
+            //    Console.WriteLine("All roles in database:");
+            //    var roles = db.Cuenta
+            //            .Include(blog => blog.CedClienteNavigation)
+            //            .ToList();
+            //    foreach (var rol in db.Rol)
+            //    {
+
+            //        Console.WriteLine(" - {0}", rol.Nombre);
+            //    }
+            //}
+
             #region "Test database Functionalities"
 
             //dal.DeleteEmpleado(1110);
@@ -71,71 +71,95 @@ namespace TestHarness
             //GeneratePUTRequest();
             //GenerateDELETERequest();
             #endregion
-
+            Asesor ase = new BancaTec.Asesor {
+                Cedula = "115250560",
+                FechaNac = DateTime.Now,
+                Nombre = "Esteban",
+                SegNombre = "Eduardo",
+                PriApellido = "Calvo",
+                SegApellido = "Vargas",
+                MetaColones = 1525.5M,
+                MetaDolares = 20035.6M
+            };
+            Asesor ase1 = new BancaTec.Asesor
+            {
+                Cedula = "115250560",
+                FechaNac = DateTime.Now,
+                Nombre = "Cambiado",
+                SegNombre = "Eduardo",
+                PriApellido = "Calvo",
+                SegApellido = "Vargas",
+                MetaColones = 1525.5M,
+                MetaDolares = 20035.6M
+            };
+            Asesor.AddAsesor(ase);
+            Asesor recuperar = Asesor.GetAsesor("115250560");
+            Asesor.UpdateAsesor(ase1);
+            recuperar = Asesor.GetAsesor("115250560");
             Console.ReadLine();
         }
 
-        private static void TestSelectCommand(Sucursal emp, Operations.Operations dal)
-        {
-            Console.WriteLine("Testing Select command");
-            emp = dal.GetSucursal("SJ45");
-            Console.WriteLine(emp.Nombre);
-        }
+        //private static void TestSelectCommand(Sucursal emp, Operations.Operations dal)
+        //{
+        //    Console.WriteLine("Testing Select command");
+        //    emp = dal.GetSucursal("SJ45");
+        //    Console.WriteLine(emp.Nombre);
+        //}
 
-        private static void TestInsertCommand(Empleado emp, Operations.Operations dal)
-        {
-            Console.WriteLine("Testing Insert Command");
-            emp = new Empleado();
-            emp.Nombre = "Eva";
-            emp.Pri_apellido = "Brown";
-            emp.Cedula = 1110;
-            emp.Seg_apellido = "Architect";
-            emp.Fecha_inicio = "01/01/0101";
-            emp.Fecha_nacimiento = "10/10/1010";
-            emp.Salario_por_hora = 15000.02;
-            emp.Sucursal = "SJ45";
-            dal.AddEmpleado(emp);
-            Empleado newEmp = new Empleado();
-            newEmp = dal.GetEmpleado(1110);
-            PrintEmployeeInformation(newEmp);           
-        }
+        //private static void TestInsertCommand(Empleado emp, Operations.Operations dal)
+        //{
+        //    Console.WriteLine("Testing Insert Command");
+        //    emp = new Empleado();
+        //    emp.Nombre = "Eva";
+        //    emp.Pri_apellido = "Brown";
+        //    emp.Cedula = 1110;
+        //    emp.Seg_apellido = "Architect";
+        //    emp.Fecha_inicio = "01/01/0101";
+        //    emp.Fecha_nacimiento = "10/10/1010";
+        //    emp.Salario_por_hora = 15000.02;
+        //    emp.Sucursal = "SJ45";
+        //    dal.AddEmpleado(emp);
+        //    Empleado newEmp = new Empleado();
+        //    newEmp = dal.GetEmpleado(1110);
+        //    PrintEmployeeInformation(newEmp);           
+        //}
 
-        private static void TestUpdateCommand(Empleado emp, Operations.Operations dal)
-        {
-            Console.WriteLine("Testing Update Command");
-            emp = new Empleado();
-            emp.Nombre = "Anne";
-            emp.Pri_apellido = "Brown";
-            emp.Cedula = 1110;
-            emp.Seg_apellido = "HR";
-            dal.UpdateEmpleado(emp);
-            PrintEmployeeInformation(emp);
-        }
+        //private static void TestUpdateCommand(Empleado emp, Operations.Operations dal)
+        //{
+        //    Console.WriteLine("Testing Update Command");
+        //    emp = new Empleado();
+        //    emp.Nombre = "Anne";
+        //    emp.Pri_apellido = "Brown";
+        //    emp.Cedula = 1110;
+        //    emp.Seg_apellido = "HR";
+        //    dal.UpdateEmpleado(emp);
+        //    PrintEmployeeInformation(emp);
+        //}
 
-        private static void TestDeleteCommand(Empleado emp, Operations.Operations dal)
-        {
-            Console.WriteLine("Testing Delete Command");
-            dal.DeleteEmpleado(1110);
-        }
+        //private static void TestDeleteCommand(Empleado emp, Operations.Operations dal)
+        //{
+        //    Console.WriteLine("Testing Delete Command");
+        //    dal.DeleteEmpleado(1110);
+        //}
 
-        private static void PrintEmployeeInformation(Empleado emp)
-        {
-            Console.WriteLine("Emplyee Number - {0}", emp.Cedula);
-            Console.WriteLine("Empleado First Name - {0}", emp.Nombre);
-            Console.WriteLine("Empleado Last Name - {0}", emp.Pri_apellido);
-            Console.WriteLine("Empleado Seg_apellido - {0}", emp.Seg_apellido);
-        }
+        //private static void PrintEmployeeInformation(Empleado emp)
+        //{
+        //    Console.WriteLine("Emplyee Number - {0}", emp.Cedula);
+        //    Console.WriteLine("Empleado First Name - {0}", emp.Nombre);
+        //    Console.WriteLine("Empleado Last Name - {0}", emp.Pri_apellido);
+        //    Console.WriteLine("Empleado Seg_apellido - {0}", emp.Seg_apellido);
+        //}
 
-        private static void TestXMLSerialization()
-        {
-            Console.WriteLine("Testing Serialization.....");
-            Empleado emp = new Empleado();
-            emp.Nombre = "Eva";
-            emp.Pri_apellido = "Brown";
-            emp.Cedula = 1110;
-            emp.Seg_apellido = "Architect";           
-            Console.WriteLine(SerializeXML(emp));
-        }
+        //private static void TestXMLSerialization()
+        //{
+        //    Console.WriteLine("Testing Serialization.....");
+        //    Empleado emp = new Empleado();
+        //    emp.Nombre = "Eva";
+        //    emp.Pri_apellido = "Brown";
+        //    emp.Cedula = 1110;
+        //    emp.Seg_apellido = "Architect";           
+        //    Console.WriteLine(SerializeXML(emp));
+        //}
 
         /// <summary>
         /// Serialize XML

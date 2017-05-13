@@ -22,7 +22,7 @@ namespace BancaTec
         public string Telefono { get; set; }
         public decimal Ingreso { get; set; }
         public char Estado { get; set; }
-        public string Contraseña { get; set; }
+        public string Contrasena { get; set; }
 
         public virtual ICollection<Cuenta> Cuenta { get; set; }
         public virtual ICollection<Pago> Pago { get; set; }

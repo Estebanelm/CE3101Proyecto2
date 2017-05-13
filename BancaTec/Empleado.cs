@@ -16,7 +16,7 @@ namespace BancaTec
         public string SegNombre { get; set; }
         public string PriApellido { get; set; }
         public string SegApellido { get; set; }
-        public string Contraseña { get; set; }
+        public string Contrasena { get; set; }
 
         public virtual ICollection<EmpleadoRol> EmpleadoRol { get; set; }
     }
