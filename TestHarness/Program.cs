@@ -96,6 +96,7 @@ namespace TestHarness
             Asesor recuperar = Asesor.GetAsesor("115250560");
             Asesor.UpdateAsesor(ase1);
             recuperar = Asesor.GetAsesor("115250560");
+            Asesor.DeleteAsesor("115250560");
             Console.ReadLine();
         }
 

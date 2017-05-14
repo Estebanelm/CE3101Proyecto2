@@ -78,5 +78,20 @@ namespace BancaTec
                 db.SaveChanges();
             }
         }
+
+        public static void DeleteAsesor(string cedula)
+        {
+            using (var db = new BancaTecContext())
+            {
+                var asesor = db.Asesor
+                                .Where(b => b.Cedula == cedula)
+                                .FirstOrDefault();
+                if (asesor != null)
+                {
+                    asesor.Estado = 'I';
+                }
+                db.SaveChanges();
+            }
+        }
     }
 }

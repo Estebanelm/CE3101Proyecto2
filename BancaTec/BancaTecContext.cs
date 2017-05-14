@@ -75,6 +75,10 @@ namespace BancaTec
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
+
                 entity.Property(e => e.Fecha).HasColumnType("date");
 
                 entity.Property(e => e.Monto).HasColumnType("money");
@@ -153,6 +157,10 @@ namespace BancaTec
                     .HasColumnType("varchar")
                     .HasMaxLength(20);
 
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
+
                 entity.Property(e => e.Moneda)
                     .IsRequired()
                     .HasColumnType("varchar")
@@ -225,6 +233,10 @@ namespace BancaTec
                     .HasColumnType("varchar")
                     .HasMaxLength(20);
 
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
+
                 entity.Property(e => e.Nombre)
                     .IsRequired()
                     .HasColumnType("varchar")
@@ -262,6 +274,10 @@ namespace BancaTec
                     .HasColumnType("bpchar")
                     .HasMaxLength(9);
 
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
+
                 entity.Property(e => e.NombreRol)
                     .IsRequired()
                     .HasColumnType("varchar")
@@ -285,6 +301,10 @@ namespace BancaTec
                 entity.ToTable("MOVIMIENTO");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
 
                 entity.Property(e => e.Fecha).HasColumnType("date");
 
@@ -310,12 +330,12 @@ namespace BancaTec
 
             modelBuilder.Entity<Pago>(entity =>
             {
-                entity.HasKey(e => e.NumPrestamo)
+                entity.HasKey(e => new { e.NumPrestamo, e.Fecha })
                     .HasName("PK_PAGO");
 
                 entity.ToTable("PAGO");
 
-                entity.Property(e => e.NumPrestamo).ValueGeneratedNever();
+                entity.Property(e => e.Fecha).HasColumnType("date");
 
                 entity.Property(e => e.CedCliente)
                     .IsRequired()
@@ -330,8 +350,6 @@ namespace BancaTec
                 entity.Property(e => e.Extraordinario)
                     .HasColumnType("money")
                     .HasDefaultValueSql("0");
-
-                entity.Property(e => e.Fecha).HasColumnType("date");
 
                 entity.Property(e => e.Monto).HasColumnType("money");
 
@@ -348,8 +366,8 @@ namespace BancaTec
                     .HasConstraintName("ClienteReference");
 
                 entity.HasOne(d => d.NumPrestamoNavigation)
-                    .WithOne(p => p.Pago)
-                    .HasForeignKey<Pago>(d => d.NumPrestamo)
+                    .WithMany(p => p.Pago)
+                    .HasForeignKey(d => d.NumPrestamo)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("PrestamoReference");
             });
@@ -413,6 +431,10 @@ namespace BancaTec
                     .IsRequired()
                     .HasColumnType("varchar")
                     .HasMaxLength(100);
+
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
             });
 
             modelBuilder.Entity<Tarjeta>(entity =>
@@ -454,6 +476,10 @@ namespace BancaTec
                 entity.ToTable("TRANSFERENCIA");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Estado)
+                    .HasColumnType("char")
+                    .HasDefaultValueSql("'A'::\"char\"");
 
                 entity.Property(e => e.Fecha).HasColumnType("date");
 

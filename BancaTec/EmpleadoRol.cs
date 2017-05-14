@@ -8,6 +8,7 @@ namespace BancaTec
         public string CedulaEmpledo { get; set; }
         public string NombreRol { get; set; }
         public int Id { get; set; }
+        public char Estado { get; set; }
 
         public virtual Empleado CedulaEmpledoNavigation { get; set; }
         public virtual Rol NombreRolNavigation { get; set; }
