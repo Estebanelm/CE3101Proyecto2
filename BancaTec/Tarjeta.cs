@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -20,9 +21,11 @@ namespace BancaTec
         public int NumCuenta { get; set; }
         public char Estado { get; set; }
         public int Numero { get; set; }
-
+        [XmlIgnore]
         public virtual ICollection<CancelarTarjeta> CancelarTarjeta { get; set; }
+        [XmlIgnore]
         public virtual ICollection<Compra> Compra { get; set; }
+        [XmlIgnore]
         public virtual Cuenta NumCuentaNavigation { get; set; }
 
         public static Tarjeta GetTarjeta(int numtarjeta)
@@ -68,7 +71,7 @@ namespace BancaTec
                                 .FirstOrDefault();
                 if (tarjeta != null)
                 {
-                    foreach (PropertyInfo property in typeof(Asesor).GetProperties())
+                    foreach (PropertyInfo property in typeof(Tarjeta).GetProperties())
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado") && !property.PropertyType.AssemblyQualifiedName.Contains("Cuenta"))
                         {

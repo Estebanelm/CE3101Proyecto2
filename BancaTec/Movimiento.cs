@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -14,7 +15,7 @@ namespace BancaTec
         public string Moneda { get; set; }
         public int Id { get; set; }
         public char Estado { get; set; }
-
+        [XmlIgnore]
         public virtual Cuenta NumCuentaNavigation { get; set; }
 
         public static List<Movimiento> GetMovimientos(int numcuenta)
@@ -63,7 +64,7 @@ namespace BancaTec
                                 .FirstOrDefault();
                 if (asesor != null)
                 {
-                    foreach (PropertyInfo property in typeof(Asesor).GetProperties())
+                    foreach (PropertyInfo property in typeof(Movimiento).GetProperties())
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado") && !property.PropertyType.AssemblyQualifiedName.Contains("Cuenta"))
                         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -20,9 +21,11 @@ namespace BancaTec
         public char Estado { get; set; }
         public int Numero { get; set; }
         public string Moneda { get; set; }
-
+        [XmlIgnore]
         public virtual ICollection<Pago> Pago { get; set; }
+        [XmlIgnore]
         public virtual Asesor CedAsesorNavigation { get; set; }
+        [XmlIgnore]
         public virtual Cliente CedClienteNavigation { get; set; }
 
         public static Prestamo GetPrestamo(int numeroPrestamo)
@@ -68,7 +71,7 @@ namespace BancaTec
                                 .FirstOrDefault();
                 if (prestamo != null)
                 {
-                    foreach (PropertyInfo property in typeof(Asesor).GetProperties())
+                    foreach (PropertyInfo property in typeof(Prestamo).GetProperties())
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado") && !property.PropertyType.AssemblyQualifiedName.Contains("Asesor") && !property.PropertyType.AssemblyQualifiedName.Contains("Cliente"))
                         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -22,11 +23,15 @@ namespace BancaTec
         public char Estado { get; set; }
         public int NumCuenta { get; set; }
         public decimal Saldo { get; set; }
-
+        [XmlIgnore]
         public virtual ICollection<Movimiento> Movimiento { get; set; }
+        [XmlIgnore]
         public virtual ICollection<Tarjeta> Tarjeta { get; set; }
+        [XmlIgnore]
         public virtual ICollection<Transferencia> TransferenciaCuentaEmisoraNavigation { get; set; }
+        [XmlIgnore]
         public virtual ICollection<Transferencia> TransferenciaCuentaReceptoraNavigation { get; set; }
+        [XmlIgnore]
         public virtual Cliente CedClienteNavigation { get; set; }
 
         public static List<Cuenta> GetCuentas(string cedula)
@@ -90,7 +95,7 @@ namespace BancaTec
                                 .FirstOrDefault();
                 if (cuenta != null)
                 {
-                    foreach (PropertyInfo property in typeof(Asesor).GetProperties())
+                    foreach (PropertyInfo property in typeof(Cuenta).GetProperties())
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado") && !property.PropertyType.AssemblyQualifiedName.Contains("Cliente"))
                         {

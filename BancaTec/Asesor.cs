@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -21,7 +22,7 @@ namespace BancaTec
         public char Estado { get; set; }
         public decimal MetaColones { get; set; }
         public decimal MetaDolares { get; set; }
-
+        [XmlIgnore]
         public virtual ICollection<Prestamo> Prestamo { get; set; }
 
         public static Asesor GetAsesor(string cedula)

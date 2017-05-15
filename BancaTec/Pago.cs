@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -15,8 +16,9 @@ namespace BancaTec
         public string Estado { get; set; }
         public int PagosRestantes { get; set; }
         public decimal Extraordinario { get; set; }
-
+        [XmlIgnore]
         public virtual Cliente CedClienteNavigation { get; set; }
+        [XmlIgnore]
         public virtual Prestamo NumPrestamoNavigation { get; set; }
 
         public static List<Pago> GetPagos(string codigo, string tipo)
@@ -77,7 +79,7 @@ namespace BancaTec
                                 .FirstOrDefault();
                 if (pago != null)
                 {
-                    foreach (PropertyInfo property in typeof(Asesor).GetProperties())
+                    foreach (PropertyInfo property in typeof(Pago).GetProperties())
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado") && !property.PropertyType.AssemblyQualifiedName.Contains("Cliente") && !property.PropertyType.AssemblyQualifiedName.Contains("Prestamo"))
                         {

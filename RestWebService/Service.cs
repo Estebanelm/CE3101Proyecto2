@@ -128,20 +128,31 @@ namespace RestWebService
                     if (_cedula_temp == null) //si no hay parámetro, obtener todos los empleados
                     {
                         List<BancaTec.Asesor> lista_asesores = Asesor.GetAsesores();
-                        string serializedList = Serialize(lista_asesores);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
+                        if (lista_asesores.Count == 0)
+                        {
+                            WriteResponse("No se encontraron Asesores");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_asesores);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
                     }
                     else //si hay parámetro cedula, obtener solo 1 empleado
                     {
                         string _cedula = _cedula_temp;
                         ase = Asesor.GetAsesor(_cedula);
                         if (ase == null)
+                        {
                             context.Response.Write("No Asesor Found: " + context.Request["cedula"]);
-
-                        string serializedAsesor = Serialize(ase);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedAsesor);
+                        }
+                        else
+                        {
+                            string serializedAsesor = Serialize(ase);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedAsesor);
+                        }
                     }
                 }
                 #endregion
@@ -152,9 +163,16 @@ namespace RestWebService
                     if (cedula_temp == null)
                     {
                         List<BancaTec.Cliente> lista_clientes = Cliente.GetClientes();
-                        string serializedList = Serialize(lista_clientes);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
+                        if (lista_clientes.Count == 0)
+                        {
+                            WriteResponse("No se encontraron clientes");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_clientes);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
 
                     }
                     else
@@ -162,11 +180,15 @@ namespace RestWebService
                         string _cedula = cedula_temp;
                         clie = Cliente.GetCliente(_cedula);
                         if (clie == null)
-                            context.Response.Write(_cedula + "No Cliente Found" + context.Request["cedula"]);
-
-                        string serializedCliente = Serialize(clie);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedCliente);
+                        {
+                            context.Response.Write("No Cliente Found: " + context.Request["cedula"]);
+                        }
+                        else
+                        {
+                            string serializedCliente = Serialize(clie);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedCliente);
+                        }
                     }
                 }
                 #endregion
@@ -186,9 +208,16 @@ namespace RestWebService
                         {
                             lista_cuentas = Cuenta.GetCuentas(cedCliente_temp);
                         }
-                        string serializedList = Serialize(lista_cuentas);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
+                        if (lista_cuentas.Count == 0)
+                        {
+                            WriteResponse("No se encontraron cuentas");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_cuentas);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
                     }
                     else
                     {
@@ -198,11 +227,15 @@ namespace RestWebService
                         //Performing Operation - READ"
                         cuen = Cuenta.GetCuenta(_num);
                         if (cuen == null)
-                            context.Response.Write(_num + "No Cuenta Found" + num_temp);
-
-                        string serializedCuenta = Serialize(cuen);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedCuenta);
+                        {
+                            context.Response.Write("No Cuenta Found: " + num_temp);
+                        }
+                        else
+                        {
+                            string serializedCuenta = Serialize(cuen);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedCuenta);
+                        }
                     }
                 }
                 #endregion
@@ -224,11 +257,16 @@ namespace RestWebService
                     {
                         lista_pagos = Pago.GetPagos();
                     }
-                    if (lista_pagos == null)
+                    if (lista_pagos.Count == 0)
+                    {
                         context.Response.Write("No Pagos Found");
-                    string serializedList = Serialize(lista_pagos);
-                    context.Response.ContentType = "text/xml";
-                    WriteResponse(serializedList);
+                    }
+                    else
+                    {
+                        string serializedList = Serialize(lista_pagos);
+                        context.Response.ContentType = "text/xml";
+                        WriteResponse(serializedList);
+                    }
                 }
                 #endregion
                 #region Prestamo
@@ -238,24 +276,32 @@ namespace RestWebService
                     if (num_temp == null)
                     {
                         List<BancaTec.Prestamo> lista_prestamos = Prestamo.GetPrestamos();
-                        string serializedList = Serialize(lista_prestamos);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
+                        if (lista_prestamos.Count == 0)
+                        {
+                            WriteResponse("No se encontraron Prestamos");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_prestamos);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
 
                     }
                     else
                     {
                         int _num = int.Parse(num_temp);
-
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
                         prest = Prestamo.GetPrestamo(_num);
                         if (prest == null)
+                        {
                             context.Response.Write(_num + "No Cuenta Found" + num_temp);
-
-                        string serializedPrestamo = Serialize(prest);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedPrestamo);
+                        }
+                        else
+                        {
+                            string serializedPrestamo = Serialize(prest);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedPrestamo);
+                        }
                     }
                 }
                 #endregion
@@ -266,10 +312,16 @@ namespace RestWebService
                     if (_numtemp == null)
                     {
                         List<BancaTec.Tarjeta> lista_tarjetas = Tarjeta.GetTarjetas();
-                        string serializedList = Serialize(lista_tarjetas);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
-
+                        if (lista_tarjetas.Count == 0)
+                        {
+                            WriteResponse("No se encontraron tarjetas");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_tarjetas);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
                     }
                     else
                     {
@@ -278,11 +330,15 @@ namespace RestWebService
                         //Performing Operation - READ"
                         tarje = Tarjeta.GetTarjeta(_num);
                         if (tarje == null)
+                        {
                             context.Response.Write(_num + "No Tarjeta Found" + _numtemp);
-
-                        string serializedTarjeta = Serialize(tarje);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedTarjeta);
+                        }
+                        else
+                        {
+                            string serializedTarjeta = Serialize(tarje);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedTarjeta);
+                        }
                     }
                 }
                 #endregion
@@ -293,9 +349,16 @@ namespace RestWebService
                     if (nombretemp == null)
                     {
                         List<BancaTec.Rol> lista_roles = Rol.GetRoles();
-                        string serializedList = Serialize(lista_roles);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
+                        if (lista_roles.Count == 0)
+                        {
+                            WriteResponse("No se encontraron roles");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_roles);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
 
                     }
                     else
@@ -306,11 +369,15 @@ namespace RestWebService
                         //Performing Operation - READ"
                         rol = Rol.GetRol(nombre);
                         if (rol == null)
-                            context.Response.Write(nombre + "No Rol Found" + nombretemp);
-
-                        string serializedRol = Serialize(rol);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedRol);
+                        {
+                            context.Response.Write("No Rol Found");
+                        }
+                        else
+                        {
+                            string serializedRol = Serialize(rol);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedRol);
+                        }
                     }
                 }
                 #endregion
@@ -321,9 +388,16 @@ namespace RestWebService
                     if (numtarjetemp == null)
                     {
                         List<BancaTec.Compra> lista_compras = Compra.GetCompras();
-                        string serializedList = Serialize(lista_compras);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
+                        if (lista_compras.Count == 0)
+                        {
+                            WriteResponse("No se encontraron compras");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_compras);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
                     }
                     else
                     {
@@ -335,9 +409,12 @@ namespace RestWebService
                         {
                             context.Response.Write(numtarjeta + "No Compras Found" + numtarjetemp);
                         }
-                        string serializedRol = Serialize(compra);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedRol);
+                        else
+                        {
+                            string serializedRol = Serialize(compra);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedRol);
+                        }
                     }
                 }
                 #endregion
@@ -348,10 +425,16 @@ namespace RestWebService
                     if (cedulatemp == null)
                     {
                         List<BancaTec.Empleado> lista_empleados = Empleado.GetEmpleados();
-                        string serializedList = Serialize(lista_empleados);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
-
+                        if (lista_empleados.Count == 0)
+                        {
+                            WriteResponse("No se encontraron empleados");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_empleados);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
                     }
                     else
                     {
@@ -361,11 +444,15 @@ namespace RestWebService
                         //Performing Operation - READ"
                         BancaTec.Empleado empleado = Empleado.GetEmpleado(cedula);
                         if (empleado == null)
+                        {
                             context.Response.Write(cedula + "No Rol Found" + cedulatemp);
-
-                        string serializedRol = Serialize(empleado);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedRol);
+                        }
+                        else
+                        {
+                            string serializedRol = Serialize(empleado);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedRol);
+                        }
                     }
                 }
                 #endregion
@@ -376,24 +463,31 @@ namespace RestWebService
                     if (numcuentatemp == null)
                     {
                         List<BancaTec.Movimiento> lista_movim = Movimiento.GetMovimientos();
-                        string serializedList = Serialize(lista_movim);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedList);
-
+                        if (lista_movim.Count == 0)
+                        {
+                            WriteResponse("No se encontraron movimientos");
+                        }
+                        else
+                        {
+                            string serializedList = Serialize(lista_movim);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedList);
+                        }
                     }
                     else
                     {
                         int numcuenta = int.Parse(numcuentatemp);
-
-                        //HTTP Request Type - GET"
-                        //Performing Operation - READ"
                         List<BancaTec.Movimiento> movimiento = Movimiento.GetMovimientos(numcuenta);
                         if (movimiento.Count == 0)
+                        {
                             context.Response.Write(numcuenta + "No Movimientos Found" + numcuentatemp);
-
-                        string serializedRol = Serialize(movimiento);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedRol);
+                        }
+                        else
+                        {
+                            string serializedRol = Serialize(movimiento);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedRol);
+                        }
                     }
                 }
                 #endregion
@@ -412,11 +506,15 @@ namespace RestWebService
                         //Performing Operation - READ"
                         List<BancaTec.Transferencia> transferencia = Transferencia.GetTransferencias(numcuentaemi);
                         if (transferencia.Count == 0)
-                            context.Response.Write(numcuentaemi + "No Transferencias Found" + numcuentaemitemp);
-
-                        string serializedRol = Serialize(transferencia);
-                        context.Response.ContentType = "text/xml";
-                        WriteResponse(serializedRol);
+                        {
+                            context.Response.Write("No se encontraron transferencias");
+                        }
+                        else
+                        {
+                            string serializedRol = Serialize(transferencia);
+                            context.Response.ContentType = "text/xml";
+                            WriteResponse(serializedRol);
+                        }
                     }
                 }
                 #endregion
@@ -484,7 +582,6 @@ namespace RestWebService
                         Moneda = context.Request["moneda"],
                         Descripcion = context.Request["descripcion"],
                         CedCliente = context.Request["cedcliente"],
-                        NumCuenta = int.Parse(context.Request["numcuenta"]),
                         Saldo = decimal.Parse(context.Request["saldo"])
                     };
                     Cuenta.AddCuenta(cuen);
@@ -511,7 +608,7 @@ namespace RestWebService
                     {
                         Interes = double.Parse(context.Request["interes"]),
                         SaldoOrig = decimal.Parse(context.Request["saldoorig"]),
-                        SaldoActual = decimal.Parse(context.Request["saldoactual"]),
+                        SaldoActual = decimal.Parse(context.Request["saldoorig"]),
                         CedCliente = context.Request["cedcliente"],
                         CedAsesor = context.Request["cedasesor"],
                         Moneda = context.Request["moneda"]
@@ -522,14 +619,15 @@ namespace RestWebService
                 #region Tarjeta
                 else if (request_instance == "tarjeta")
                 {
+                    Random getrandom = new Random();
+                    int random = getrandom.Next(0,999);
                     BancaTec.Tarjeta tarj = new BancaTec.Tarjeta
                     {
-                        CodigoSeg = context.Request["codigoseg"],
+                        CodigoSeg = context.Request["codigoseg"].ToString() == "" ? random.ToString() : context.Request["codigoseg"],
                         FechaExp = DateTime.Parse(context.Request["fechaexp"]),
                         Saldo = context.Request["tipo"] == "credito" ? decimal.Parse(context.Request["saldo"]) : 0,
                         Tipo = context.Request["tipo"],
-                        NumCuenta = int.Parse(context.Request["numcuenta"]),
-                        Numero = int.Parse(context.Request["numero"])
+                        NumCuenta = int.Parse(context.Request["numcuenta"])
                     };
                     Tarjeta.AddTarjeta(tarj);
                 }
@@ -564,6 +662,7 @@ namespace RestWebService
                     BancaTec.Empleado emple = new BancaTec.Empleado
                     {
                         Cedula = context.Request["cedula"],
+                        Sucursal = context.Request["sucursal"].ToString() == "" ? null : context.Request["sucursal"],
                         Nombre = context.Request["nombre"],
                         SegNombre = context.Request["segnombre"],
                         PriApellido = context.Request["priapellido"],
@@ -756,6 +855,7 @@ namespace RestWebService
                     BancaTec.Empleado emple = new BancaTec.Empleado
                     {
                         Cedula = context.Request["cedula"],
+                        Sucursal = context.Request["sucursal"] == "" ? null : context.Request["sucursal"],
                         Nombre = context.Request["nombre"],
                         SegNombre = context.Request["segnombre"],
                         PriApellido = context.Request["priapellido"],

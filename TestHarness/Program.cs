@@ -71,33 +71,11 @@ namespace TestHarness
             //GeneratePUTRequest();
             //GenerateDELETERequest();
             #endregion
-            Asesor ase = new BancaTec.Asesor {
-                Cedula = "115250560",
-                FechaNac = DateTime.Now,
-                Nombre = "Esteban",
-                SegNombre = "Eduardo",
-                PriApellido = "Calvo",
-                SegApellido = "Vargas",
-                MetaColones = 1525.5M,
-                MetaDolares = 20035.6M
-            };
-            Asesor ase1 = new BancaTec.Asesor
-            {
-                Cedula = "115250560",
-                FechaNac = DateTime.Now,
-                Nombre = "Cambiado",
-                SegNombre = "Eduardo",
-                PriApellido = "Calvo",
-                SegApellido = "Vargas",
-                MetaColones = 1525.5M,
-                MetaDolares = 20035.6M
-            };
-            Asesor.AddAsesor(ase);
-            Asesor recuperar = Asesor.GetAsesor("115250560");
-            Asesor.UpdateAsesor(ase1);
-            recuperar = Asesor.GetAsesor("115250560");
-            Asesor.DeleteAsesor("115250560");
-            Console.ReadLine();
+            //Rol lista_roles = Rol.GetRol("administrador");
+            //string serializedList = Serialize(lista_roles);
+            Cuenta cuenta = new Cuenta { Tipo = "Ahorros", Moneda = "Colones", Descripcion = "cuenta de pelonchis", CedCliente = "115250560", Saldo = 0 };
+            Cuenta.AddCuenta(cuenta);
+            Console.WriteLine();
         }
 
         //private static void TestSelectCommand(Sucursal emp, Operations.Operations dal)
@@ -357,6 +335,41 @@ namespace TestHarness
             xmlWriter.Flush();
             xmlWriter.Close();
             return mStream.ToArray();
+        }
+
+        /// <summary>
+        /// Convierte una clase en un XML
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        static String Serialize<T>(T obj)
+        {
+            ErrorHandler.ErrorHandler errHandler = new ErrorHandler.ErrorHandler();
+
+            try
+            {
+                String XmlizedString = null;
+                XmlSerializer xs = new XmlSerializer(typeof(T));
+                //create an instance of the MemoryStream class since we intend to keep the XML string 
+                //in memory instead of saving it to a file.
+                MemoryStream memoryStream = new MemoryStream();
+                //XmlTextWriter - fast, non-cached, forward-only way of generating streams or files 
+                //containing XML data
+                XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
+                //Serialize emp in the xmlTextWriter
+                xs.Serialize(xmlTextWriter, obj);
+                //Get the BaseStream of the xmlTextWriter in the Memory Stream
+                memoryStream = (MemoryStream)xmlTextWriter.BaseStream;
+                //Convert to array
+                XmlizedString = UTF8ByteArrayToString(memoryStream.ToArray());
+                return XmlizedString;
+            }
+            catch (Exception ex)
+            {
+                errHandler.ErrorMessage = ex.Message.ToString();
+                throw;
+            }
+
         }
     }
 }

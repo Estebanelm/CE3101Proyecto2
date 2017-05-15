@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace BancaTec
 {
@@ -20,7 +21,7 @@ namespace BancaTec
         public string SegApellido { get; set; }
         public string Contrasena { get; set; }
         public char Estado { get; set; }
-
+        [XmlIgnore]
         public virtual ICollection<EmpleadoRol> EmpleadoRol { get; set; }
 
         public static Empleado GetEmpleado(string cedula)
@@ -66,7 +67,7 @@ namespace BancaTec
                                 .FirstOrDefault();
                 if (empleado != null)
                 {
-                    foreach (PropertyInfo property in typeof(Asesor).GetProperties())
+                    foreach (PropertyInfo property in typeof(Empleado).GetProperties())
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado"))
                         {
