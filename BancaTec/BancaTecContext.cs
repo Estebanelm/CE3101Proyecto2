@@ -22,7 +22,6 @@ namespace BancaTec
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
             optionsBuilder.UseNpgsql(@"Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017");
         }
 
@@ -116,6 +115,12 @@ namespace BancaTec
                     .HasDefaultValueSql("'A'::\"char\"");
 
                 entity.Property(e => e.Ingreso).HasColumnType("money");
+
+                entity.Property(e => e.Moneda)
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(7)
+                    .HasDefaultValueSql("'Colones'::character varying");
 
                 entity.Property(e => e.Nombre)
                     .IsRequired()
@@ -345,7 +350,7 @@ namespace BancaTec
                 entity.Property(e => e.Estado)
                     .IsRequired()
                     .HasColumnType("varchar")
-                    .HasMaxLength(7);
+                    .HasMaxLength(9);
 
                 entity.Property(e => e.Extraordinario)
                     .HasColumnType("money")

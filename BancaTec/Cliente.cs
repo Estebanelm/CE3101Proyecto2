@@ -26,6 +26,7 @@ namespace BancaTec
         public decimal Ingreso { get; set; }
         public char Estado { get; set; }
         public string Contrasena { get; set; }
+        public string Moneda { get; set; }
         [XmlIgnore]
         public virtual ICollection<Cuenta> Cuenta { get; set; }
         [XmlIgnore]

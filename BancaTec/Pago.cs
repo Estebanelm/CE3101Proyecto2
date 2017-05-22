@@ -26,7 +26,7 @@ namespace BancaTec
             List<Pago> listapagoobj = new List<Pago>();
             using (var db = new BancaTecContext())
             {
-                if (tipo == "cliente")
+                if (tipo.Equals("cliente"))
                 {
                     var listapagos = db.Pago
                             .Where(b => b.CedCliente == codigo);
@@ -35,7 +35,7 @@ namespace BancaTec
                         listapagoobj.Add(pago);
                     }
                 }
-                else if (tipo == "prestamo")
+                else if (tipo.Equals("prestamo"))
                 {
                     var listapagos = db.Pago
                             .Where(b => b.NumPrestamo == int.Parse(codigo));

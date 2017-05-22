@@ -73,8 +73,14 @@ namespace TestHarness
             #endregion
             //Rol lista_roles = Rol.GetRol("administrador");
             //string serializedList = Serialize(lista_roles);
-            Cuenta cuenta = new Cuenta { Tipo = "Ahorros", Moneda = "Colones", Descripcion = "cuenta de pelonchis", CedCliente = "115250560", Saldo = 0 };
-            Cuenta.AddCuenta(cuenta);
+            //Cuenta cuenta = new Cuenta { Tipo = "Ahorros", Moneda = "Colones", Descripcion = "cuenta de pelonchis", CedCliente = "115250560", Saldo = 0 };
+            //Cuenta.AddCuenta(cuenta);
+
+            Operations.Operations operation = new Operations.Operations("Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017");
+            decimal asd = operation.PMT(2.1, 12, 1000000);
+            //List<Comision> lista = operation.ReporteComisiones();
+            string sehizo = operation.GenerarCalendarioPagos(8, 12);
+            //decimal cambio = operation.CambioMoneda(1000.00M, "Colones", "Dolares");
             Console.WriteLine();
         }
 

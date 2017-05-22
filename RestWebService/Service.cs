@@ -518,10 +518,52 @@ namespace RestWebService
                     }
                 }
                 #endregion
+
+                #region Reporte Comisiones
+                else if (request_instance == "comisiones")
+                {
+                    List<Operations.Comision> listaComisiones = operations.ReporteComisiones();
+                    string serializedRol = Serialize(listaComisiones);
+                    context.Response.ContentType = "text/xml";
+                    WriteResponse(serializedRol);
+                }
+                #endregion
+                #region Mora sin fecha
+                else if (request_instance == "mora")
+                {
+                    string cedula = context.Request["cedula"];
+                    if (cedula == null)
+                    {
+                        WriteResponse("Datos incorrectos, ingrese parámetro cedula");
+                    }
+                    else
+                    {
+                        List<Operations.Mora> listaMoras = operations.ReporteDeMora(cedula);
+                        string serializedList = Serialize(listaMoras);
+                        WriteResponse(serializedList);
+                    }
+                }
+                #endregion
+                #region Mora con fecha
+                else if (request_instance == "morafecha")
+                {
+                    string cedula = context.Request["cedula"];
+                    if (cedula == null)
+                    {
+                        WriteResponse("Datos incorrectos, ingrese parámetro cedula");
+                    }
+                    else
+                    {
+                        List<Operations.MoraFechas> listaMoras = operations.ReporteDeMoraFechas(cedula);
+                        string serializedList = Serialize(listaMoras);
+                        WriteResponse(serializedList);
+                    }
+                }
+                #endregion
             }
             catch (Exception ex)
             {
-                WriteResponse(ex.Message.ToString());
+                WriteResponse(ex.InnerException.Message);
                 errHandler.ErrorMessage = operations.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();
             }
@@ -568,7 +610,8 @@ namespace RestWebService
                         Direccion = context.Request["direccion"],
                         Telefono = context.Request["telefono"],
                         Ingreso = decimal.Parse(context.Request["ingreso"]),
-                        Contrasena = context.Request["contrasena"]
+                        Contrasena = context.Request["contrasena"],
+                        Moneda = context.Request["moneda"]
                     };
                     Cliente.AddCliente(clie);
                 }
@@ -686,8 +729,8 @@ namespace RestWebService
                     Movimiento.AddMovimiento(movi);
                 }
                 #endregion
-                #region Transferencia
-                else if (request_instance == "transferencia")
+                #region Transferencialegacy
+                else if (request_instance == "transferenciavieja")
                 {
                     BancaTec.Transferencia transf = new BancaTec.Transferencia
                     {
@@ -700,11 +743,55 @@ namespace RestWebService
                     Transferencia.AddTransferencia(transf);
                 }
                 #endregion
+
+                #region Transferencia
+                else if (request_instance == "transferencia")
+                {
+                    string montotemp = context.Request["monto"];
+                    string emisoratemp = context.Request["cuentaemisora"];
+                    string receptoratemp = context.Request["cuentareceptora"];
+                    string moneda = context.Request["moneda"];
+                    string respuesta = operations.RealizarTransferencia(decimal.Parse(montotemp), int.Parse(emisoratemp), int.Parse(receptoratemp), moneda);
+                    if (respuesta.Equals("ok"))
+                    {
+                        WriteResponse("Transferencia realizada correctamente");
+                    }
+                    else
+                    {
+                        WriteResponse(respuesta);
+                    }
+                }
+                #endregion
+                #region Calendario de Pagos
+                else if (request_instance == "calendario")
+                {
+                    string numPrestamotemp = context.Request["numprestamo"];
+                    string mesestemp = context.Request["meses"];
+                    if (numPrestamotemp == null || mesestemp == null)
+                    {
+                        WriteResponse("Datos incorrectos o mal ingresados");
+                    }
+                    else
+                    {
+                        int numPrestamo = int.Parse(numPrestamotemp);
+                        int meses = int.Parse(mesestemp);
+                        string generado = operations.GenerarCalendarioPagos(numPrestamo, meses);
+                        if (generado.Equals("ok"))
+                        {
+                            WriteResponse("Operacion completada");
+                        }
+                        else
+                        {
+                            WriteResponse(generado);
+                        }
+                    }
+                }
+                #endregion
             }
             catch (Exception ex)
             {
 
-                WriteResponse(ex.Message.ToString());
+                WriteResponse(ex.InnerException.Message);
                 errHandler.ErrorMessage = operations.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();
             }
@@ -752,7 +839,8 @@ namespace RestWebService
                         Direccion = context.Request["direccion"],
                         Telefono = context.Request["telefono"],
                         Ingreso = decimal.Parse(context.Request["ingreso"]),
-                        Contrasena = context.Request["contrasena"]
+                        Contrasena = context.Request["contrasena"],
+                        Moneda = context.Request["moneda"]
                     };
                     Cliente.UpdateCliente(clie);
                     WriteResponse("ok");
@@ -902,7 +990,7 @@ namespace RestWebService
             catch (Exception ex)
             {
 
-                WriteResponse(ex.Message.ToString());
+                WriteResponse(ex.InnerException.Message);
                 errHandler.ErrorMessage = operations.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();
             }
@@ -1017,7 +1105,7 @@ namespace RestWebService
             catch (Exception ex)
             {
 
-                WriteResponse(ex.Message.ToString());
+                WriteResponse(ex.InnerException.Message);
                 errHandler.ErrorMessage = operations.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();
             }
