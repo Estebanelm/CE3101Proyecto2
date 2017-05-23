@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErrorHandler", "ErrorHandler\ErrorHandler.csproj", "{EFD8F4AE-6853-463A-AEBF-99BDF201A3CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHarness", "TestHarness\TestHarness.csproj", "{E5856649-3726-4F73-A4C4-133EB0598FBA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A401793F-080D-495C-A522-DCB9B7F15A1B} = {A401793F-080D-495C-A522-DCB9B7F15A1B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestWebService", "RestWebService\RestWebService.csproj", "{A401793F-080D-495C-A522-DCB9B7F15A1B}"
 EndProject

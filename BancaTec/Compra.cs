@@ -12,7 +12,9 @@ namespace BancaTec
         public string Comercio { get; set; }
         public decimal Monto { get; set; }
         public string Moneda { get; set; }
+        public DateTime Fecha { get; set; }
         public int Id { get; set; }
+        [XmlIgnore]
         public char Estado { get; set; }
         [XmlIgnore]
         public virtual Tarjeta NumTarjetaNavigation { get; set; }
@@ -23,7 +25,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var listacompra = db.Compra
-                    .Where(b => b.NumTarjeta == numtarjeta);
+                    .Where(b => b.NumTarjeta == numtarjeta && b.Estado.Equals('A'));
                 foreach (var compra in listacompra)
                 {
                     listacompraobj.Add(compra);
@@ -39,7 +41,10 @@ namespace BancaTec
             {
                 foreach (var compra in db.Compra)
                 {
-                    lista_compras.Add(compra);
+                    if (compra.Estado == 'A')
+                    {
+                        lista_compras.Add(compra);
+                    }
                 }
             }
             return lista_compras;
@@ -71,6 +76,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -85,6 +94,10 @@ namespace BancaTec
                 if (compra != null)
                 {
                     compra.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

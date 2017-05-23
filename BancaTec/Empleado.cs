@@ -20,6 +20,7 @@ namespace BancaTec
         public string PriApellido { get; set; }
         public string SegApellido { get; set; }
         public string Contrasena { get; set; }
+        [XmlIgnore]
         public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<EmpleadoRol> EmpleadoRol { get; set; }
@@ -29,7 +30,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var asesor = db.Empleado
-                    .Where(b => b.Cedula == cedula)
+                    .Where(b => b.Cedula == cedula && b.Estado.Equals('A'))
                     .FirstOrDefault();
 
                 return asesor;
@@ -43,7 +44,10 @@ namespace BancaTec
             {
                 foreach (var empleado in db.Empleado)
                 {
-                    lista_empleados.Add(empleado);
+                    if (empleado.Estado == 'A')
+                    {
+                        lista_empleados.Add(empleado);
+                    }
                 }
             }
             return lista_empleados;
@@ -53,7 +57,17 @@ namespace BancaTec
         {
             using (var db = new BancaTecContext())
             {
-                db.Empleado.Add(empl);
+                var empleado = db.Empleado
+                                .Where(b => b.Cedula == empl.Cedula)
+                                .FirstOrDefault();
+                if (empleado == null)
+                {
+                    db.Empleado.Add(empl);
+                }
+                else
+                {
+                    empleado.Estado = 'A';
+                }
                 db.SaveChanges();
             }
         }
@@ -71,9 +85,23 @@ namespace BancaTec
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado"))
                         {
-                            property.SetValue(empleado, property.GetValue(empl, null), null);
+                            if (property.Name == "Contrasena")
+                            {
+                                if (empl.Contrasena != null)
+                                {
+                                    property.SetValue(empleado, property.GetValue(empl, null), null);
+                                }
+                            }
+                            else
+                            {
+                                property.SetValue(empleado, property.GetValue(empl, null), null);
+                            }
                         }
                     }
+                }
+                else
+                {
+                    throw (new Exception());
                 }
                 db.SaveChanges();
             }
@@ -89,6 +117,10 @@ namespace BancaTec
                 if (empleado != null)
                 {
                     empleado.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

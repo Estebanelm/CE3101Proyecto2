@@ -14,6 +14,7 @@ namespace BancaTec
         public int CuentaReceptora { get; set; }
         public string Moneda { get; set; }
         public int Id { get; set; }
+        [XmlIgnore]
         public char Estado { get; set; }
         [XmlIgnore]
         public virtual Cuenta CuentaEmisoraNavigation { get; set; }
@@ -26,7 +27,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var listatransferencias = db.Transferencia
-                    .Where(b => b.CuentaEmisora == numcuenta && b.CuentaReceptora == numcuenta);
+                    .Where(b => b.CuentaEmisora == numcuenta && b.CuentaReceptora == numcuenta && b.Estado.Equals('A'));
                 foreach (var movimiento in listatransferencias)
                 {
                     listatransferenciasobj.Add(movimiento);
@@ -61,6 +62,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -75,6 +80,10 @@ namespace BancaTec
                 if (transferencia != null)
                 {
                     transferencia.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

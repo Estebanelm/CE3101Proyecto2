@@ -16,11 +16,13 @@ namespace BancaTec
 
         public string CodigoSeg { get; set; }
         public DateTime FechaExp { get; set; }
-        public decimal? Saldo { get; set; }
+        public decimal? SaldoOrig { get; set; }
+        public decimal? SaldoActual { get; set; }
         public string Tipo { get; set; }
         public int NumCuenta { get; set; }
-        public char Estado { get; set; }
         public int Numero { get; set; }
+        [XmlIgnore]
+        public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<CancelarTarjeta> CancelarTarjeta { get; set; }
         [XmlIgnore]
@@ -33,7 +35,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var tarjeta = db.Tarjeta
-                    .Where(b => b.Numero == numtarjeta)
+                    .Where(b => b.Numero == numtarjeta && b.Estado.Equals('A'))
                     .FirstOrDefault();
 
                 return tarjeta;
@@ -47,7 +49,10 @@ namespace BancaTec
             {
                 foreach (var tarjeta in db.Tarjeta)
                 {
-                    lista_tarjetas.Add(tarjeta);
+                    if (tarjeta.Estado == 'A')
+                    {
+                        lista_tarjetas.Add(tarjeta);
+                    }
                 }
             }
             return lista_tarjetas;
@@ -79,6 +84,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -93,6 +102,10 @@ namespace BancaTec
                 if (tarjeta != null)
                 {
                     tarjeta.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

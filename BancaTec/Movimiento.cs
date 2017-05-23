@@ -14,6 +14,7 @@ namespace BancaTec
         public int NumCuenta { get; set; }
         public string Moneda { get; set; }
         public int Id { get; set; }
+        [XmlIgnore]
         public char Estado { get; set; }
         [XmlIgnore]
         public virtual Cuenta NumCuentaNavigation { get; set; }
@@ -24,10 +25,13 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var listamovimientos = db.Movimiento
-                    .Where(b => b.NumCuenta == numcuenta);
+                    .Where(b => b.NumCuenta == numcuenta && b.Estado.Equals('A'));
                 foreach (var movimiento in listamovimientos)
                 {
-                    listamovimientosobj.Add(movimiento);
+                    if (movimiento.Estado == 'A')
+                    {
+                        listamovimientosobj.Add(movimiento);
+                    }
                 }
             }
             return listamovimientosobj;
@@ -40,7 +44,10 @@ namespace BancaTec
             {
                 foreach (var movimiento in db.Movimiento)
                 {
-                    lista_movimientos.Add(movimiento);
+                    if (movimiento.Estado == 'A')
+                    {
+                        lista_movimientos.Add(movimiento);
+                    }
                 }
             }
             return lista_movimientos;
@@ -72,6 +79,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -86,6 +97,10 @@ namespace BancaTec
                 if (asesor != null)
                 {
                     asesor.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

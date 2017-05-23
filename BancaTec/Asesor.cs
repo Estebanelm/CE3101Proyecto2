@@ -19,9 +19,10 @@ namespace BancaTec
         public string SegNombre { get; set; }
         public string PriApellido { get; set; }
         public string SegApellido { get; set; }
-        public char Estado { get; set; }
         public decimal MetaColones { get; set; }
         public decimal MetaDolares { get; set; }
+        [XmlIgnore]
+        public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<Prestamo> Prestamo { get; set; }
 
@@ -30,7 +31,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var asesor = db.Asesor
-                    .Where(b => b.Cedula == cedula)
+                    .Where(b => b.Cedula == cedula && b.Estado.Equals('A'))
                     .FirstOrDefault();
 
                 return asesor;
@@ -44,7 +45,10 @@ namespace BancaTec
             {
                 foreach (var asesor in db.Asesor)
                 {
-                    lista_asesores.Add(asesor);
+                    if (asesor.Estado == 'A')
+                    {
+                        lista_asesores.Add(asesor);
+                    }
                 }
             }
             return lista_asesores;
@@ -54,7 +58,17 @@ namespace BancaTec
         {
             using (var db = new BancaTecContext())
             {
-                db.Asesor.Add(ase);
+                var asesor = db.Asesor
+                                .Where(b => b.Cedula == ase.Cedula)
+                                .FirstOrDefault();
+                if (asesor == null)
+                {
+                    db.Asesor.Add(ase);
+                }
+                else
+                {
+                    asesor.Estado = 'A';
+                }
                 db.SaveChanges();
             }
         }
@@ -76,6 +90,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -90,6 +108,10 @@ namespace BancaTec
                 if (asesor != null)
                 {
                     asesor.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

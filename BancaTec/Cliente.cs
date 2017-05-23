@@ -24,9 +24,10 @@ namespace BancaTec
         public string Direccion { get; set; }
         public string Telefono { get; set; }
         public decimal Ingreso { get; set; }
-        public char Estado { get; set; }
         public string Contrasena { get; set; }
         public string Moneda { get; set; }
+        [XmlIgnore]
+        public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<Cuenta> Cuenta { get; set; }
         [XmlIgnore]
@@ -39,7 +40,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var cliente = db.Cliente
-                    .Where(b => b.Cedula == cedula)
+                    .Where(b => b.Cedula == cedula && b.Estado.Equals('A'))
                     .FirstOrDefault();
 
                 return cliente;
@@ -53,7 +54,10 @@ namespace BancaTec
             {
                 foreach (var cliente in db.Cliente)
                 {
-                    lista_clientes.Add(cliente);
+                    if (cliente.Estado == 'A')
+                    {
+                        lista_clientes.Add(cliente);
+                    }
                 }
             }
             return lista_clientes;
@@ -63,7 +67,17 @@ namespace BancaTec
         {
             using (var db = new BancaTecContext())
             {
-                db.Cliente.Add(clie);
+                var cliente = db.Cliente
+                                .Where(b => b.Cedula == clie.Cedula)
+                                .FirstOrDefault();
+                if (cliente == null)
+                {
+                    db.Cliente.Add(clie);
+                }
+                else
+                {
+                    cliente.Estado = 'A';
+                }
                 db.SaveChanges();
             }
         }
@@ -72,7 +86,7 @@ namespace BancaTec
         {
             using (var db = new BancaTecContext())
             {
-                var cliente = db.Asesor
+                var cliente = db.Cliente
                                 .Where(b => b.Cedula == clie.Cedula)
                                 .FirstOrDefault();
                 if (cliente != null)
@@ -81,9 +95,23 @@ namespace BancaTec
                     {
                         if (!property.PropertyType.AssemblyQualifiedName.Contains("ICollection") && !(property.Name == "Estado"))
                         {
-                            property.SetValue(cliente, property.GetValue(clie, null), null);
+                            if (property.Name == "Contrasena")
+                            {
+                                if (clie.Contrasena != null)
+                                {
+                                    property.SetValue(cliente, property.GetValue(clie, null), null);
+                                }
+                            }
+                            else
+                            {
+                                property.SetValue(cliente, property.GetValue(clie, null), null);
+                            }
                         }
                     }
+                }
+                else
+                {
+                    throw (new Exception());
                 }
                 db.SaveChanges();
             }
@@ -93,12 +121,16 @@ namespace BancaTec
         {
             using (var db = new BancaTecContext())
             {
-                var cliente = db.Asesor
+                var cliente = db.Cliente
                                 .Where(b => b.Cedula == cedula)
                                 .FirstOrDefault();
                 if (cliente != null)
                 {
                     cliente.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

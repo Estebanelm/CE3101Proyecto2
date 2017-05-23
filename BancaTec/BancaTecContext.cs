@@ -166,6 +166,8 @@ namespace BancaTec
                     .HasColumnType("char")
                     .HasDefaultValueSql("'A'::\"char\"");
 
+                entity.Property(e => e.Fecha).HasColumnType("date");
+
                 entity.Property(e => e.Moneda)
                     .IsRequired()
                     .HasColumnType("varchar")
@@ -460,7 +462,11 @@ namespace BancaTec
 
                 entity.Property(e => e.FechaExp).HasColumnType("date");
 
-                entity.Property(e => e.Saldo)
+                entity.Property(e => e.SaldoActual)
+                    .HasColumnType("money")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.SaldoOrig)
                     .HasColumnType("money")
                     .HasDefaultValueSql("0");
 

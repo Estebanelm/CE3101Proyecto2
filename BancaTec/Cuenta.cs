@@ -20,9 +20,10 @@ namespace BancaTec
         public string Moneda { get; set; }
         public string Descripcion { get; set; }
         public string CedCliente { get; set; }
-        public char Estado { get; set; }
         public int NumCuenta { get; set; }
         public decimal Saldo { get; set; }
+        [XmlIgnore]
+        public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<Movimiento> Movimiento { get; set; }
         [XmlIgnore]
@@ -40,7 +41,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var listaCuentas = db.Cuenta
-                    .Where(b => b.CedCliente == cedula);
+                    .Where(b => b.CedCliente == cedula && b.Estado.Equals('A'));
 
                 foreach (var cuen in listaCuentas)
                 {
@@ -58,9 +59,11 @@ namespace BancaTec
             {
                 foreach (var cuen in db.Cuenta)
                 {
-                    listaCuentasobj.Add(cuen);
+                    if (cuen.Estado == 'A')
+                    {
+                        listaCuentasobj.Add(cuen);
+                    }
                 }
-
                 return listaCuentasobj;
             }
         }
@@ -70,9 +73,8 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var cuenta = db.Cuenta
-                    .Where(b => b.NumCuenta == num)
+                    .Where(b => b.NumCuenta == num && b.Estado.Equals('A'))
                     .FirstOrDefault();
-
                 return cuenta;
             }
         }
@@ -103,6 +105,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -117,6 +123,10 @@ namespace BancaTec
                 if (cuenta != null)
                 {
                     cuenta.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

@@ -15,19 +15,27 @@ namespace BancaTec
 
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
+        [XmlIgnore]
         public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<EmpleadoRol> EmpleadoRol { get; set; }
 
         public static Rol GetRol(string nombre)
         {
-            using (var db = new BancaTecContext())
+            if (nombre == null)
             {
-                var rol = db.Rol
-                    .Where(b => b.Nombre == nombre)
-                    .FirstOrDefault();
+                return null;
+            }
+            else
+            {
+                using (var db = new BancaTecContext())
+                {
+                    var rol = db.Rol
+                        .Where(b => b.Nombre == nombre && b.Estado.Equals('A'))
+                        .FirstOrDefault();
 
-                return rol;
+                    return rol;
+                }
             }
         }
 
@@ -38,7 +46,10 @@ namespace BancaTec
             {
                 foreach (var rol in db.Rol)
                 {
-                    lista_roles.Add(rol);
+                    if (rol.Estado == 'A')
+                    {
+                        lista_roles.Add(rol);
+                    }
                 }
             }
             return lista_roles;
@@ -48,7 +59,17 @@ namespace BancaTec
         {
             using (var db = new BancaTecContext())
             {
-                db.Rol.Add(rol);
+                var rolViejo = db.Rol
+                                .Where(b => b.Nombre == rol.Nombre)
+                                .FirstOrDefault();
+                if (rolViejo == null)
+                {
+                    db.Rol.Add(rol);
+                }
+                else
+                {
+                    rolViejo.Estado = 'A';
+                }
                 db.SaveChanges();
             }
         }
@@ -70,6 +91,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -84,6 +109,10 @@ namespace BancaTec
                 if (rol != null)
                 {
                     rol.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

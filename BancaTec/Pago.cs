@@ -13,9 +13,9 @@ namespace BancaTec
         public DateTime Fecha { get; set; }
         public string CedCliente { get; set; }
         public decimal MontoInteres { get; set; }
-        public string Estado { get; set; }
         public int PagosRestantes { get; set; }
         public decimal Extraordinario { get; set; }
+        public string Estado { get; set; }
         [XmlIgnore]
         public virtual Cliente CedClienteNavigation { get; set; }
         [XmlIgnore]
@@ -87,6 +87,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -101,6 +105,10 @@ namespace BancaTec
                 if (pago != null)
                 {
                     pago.Estado = "Pagado";
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }

@@ -18,9 +18,10 @@ namespace BancaTec
         public decimal SaldoActual { get; set; }
         public string CedCliente { get; set; }
         public string CedAsesor { get; set; }
-        public char Estado { get; set; }
         public int Numero { get; set; }
         public string Moneda { get; set; }
+        [XmlIgnore]
+        public char Estado { get; set; }
         [XmlIgnore]
         public virtual ICollection<Pago> Pago { get; set; }
         [XmlIgnore]
@@ -33,7 +34,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var prestamo = db.Prestamo
-                    .Where(b => b.Numero == numeroPrestamo)
+                    .Where(b => b.Numero == numeroPrestamo && b.Estado.Equals('A'))
                     .FirstOrDefault();
 
                 return prestamo;
@@ -47,7 +48,10 @@ namespace BancaTec
             {
                 foreach (var prestamo in db.Prestamo)
                 {
-                    lista_prestamos.Add(prestamo);
+                    if (prestamo.Estado == 'A')
+                    {
+                        lista_prestamos.Add(prestamo);
+                    }
                 }
             }
             return lista_prestamos;
@@ -79,6 +83,10 @@ namespace BancaTec
                         }
                     }
                 }
+                else
+                {
+                    throw (new Exception());
+                }
                 db.SaveChanges();
             }
         }
@@ -93,6 +101,10 @@ namespace BancaTec
                 if (prestamo != null)
                 {
                     prestamo.Estado = 'I';
+                }
+                else
+                {
+                    throw (new Exception("No se encontro instancia"));
                 }
                 db.SaveChanges();
             }
