@@ -450,12 +450,27 @@ namespace RestWebService
                         }
                         else
                         {
-                            EmpleadoRol emplerol = EmpleadoRol.GetEmpleadoRol(cedula);
-                            string serializedemplerol = Serialize(emplerol);
                             string serializedRol = Serialize(empleado);
                             context.Response.ContentType = "text/xml";
-                            WriteResponse(serializedRol+serializedemplerol);
+                            WriteResponse(serializedRol);
                         }
+                    }
+                }
+                #endregion
+                #region
+                else if (request_instance == "empleadorol")
+                {
+                    string cedula = context.Request["cedulaempleado"];
+                    if (cedula == null)
+                    {
+                        WriteResponse("No se encontro ese empleado en la lista");
+                    }
+                    else
+                    {
+                        EmpleadoRol emplerol = EmpleadoRol.GetEmpleadoRol(cedula);
+                        string serializedList = Serialize(emplerol);
+                        context.Response.ContentType = "text/xml";
+                        WriteResponse(serializedList);
                     }
                 }
                 #endregion
