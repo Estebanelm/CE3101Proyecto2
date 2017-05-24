@@ -9,12 +9,93 @@ namespace Operations
 {
     public class MoraFechas
     {
-        private string NombreCompleto { set; get; }
-        private string Cedula { get; set; }
-        private int NumPrestamo { get; set; }
-        private DateTime Vencidas { get; set; }
-        private decimal Monto { get; set; }
-        private string Moneda { get; set; }
+        public MoraFechas()
+        { }
+
+        private string nombreCompleto;
+        private string cedula;
+        private int numPrestamo;
+        private DateTime vencidas;
+        private decimal monto;
+        private string moneda;
+
+        public string NombreCompleto
+        {
+            get
+            {
+                return nombreCompleto;
+            }
+
+            set
+            {
+                nombreCompleto = value;
+            }
+        }
+
+        public string Cedula
+        {
+            get
+            {
+                return cedula;
+            }
+
+            set
+            {
+                cedula = value;
+            }
+        }
+
+        public int NumPrestamo
+        {
+            get
+            {
+                return numPrestamo;
+            }
+
+            set
+            {
+                numPrestamo = value;
+            }
+        }
+
+        public DateTime Vencidas
+        {
+            get
+            {
+                return vencidas;
+            }
+
+            set
+            {
+                vencidas = value;
+            }
+        }
+
+        public decimal Monto
+        {
+            get
+            {
+                return monto;
+            }
+
+            set
+            {
+                monto = value;
+            }
+        }
+
+        public string Moneda
+        {
+            get
+            {
+                return moneda;
+            }
+
+            set
+            {
+                moneda = value;
+            }
+        }
 
         public MoraFechas(NpgsqlDataReader dr)
         {

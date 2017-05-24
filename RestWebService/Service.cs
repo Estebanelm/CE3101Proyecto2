@@ -646,31 +646,51 @@ namespace RestWebService
                 #region Pago
                 else if (request_instance == "pago")
                 {
-                    BancaTec.Pago pag = new BancaTec.Pago
+                    int cuenta = int.Parse(context.Request["cuenta"]);
+                    int numprestamo = int.Parse(context.Request["numprestamo"]);
+                    if (context.Request["extra"] != null)
                     {
-                        Monto = decimal.Parse(context.Request["monto"]),
-                        NumPrestamo = int.Parse(context.Request["numprestamo"]),
-                        Fecha = DateTime.Parse(context.Request["fecha"]),
-                        CedCliente = context.Request["cedcliente"],
-                        PagosRestantes = int.Parse(context.Request["pagosrestantes"])
-                    };
-                    Pago.AddPago(pag);
-                    WriteResponse("Pago creado correctamente");
+                        int extra = int.Parse(context.Request["extra"]);
+                        string respuesta = operations.PagoPrestamoExtraordinarioCliente(cuenta, numprestamo, extra);
+                        if (!respuesta.Equals("ok"))
+                        {
+                            WriteResponse(respuesta);
+                        }
+                        else
+                        {
+                            WriteResponse("Pago creado correctamente");
+                        }
+                    }
+                    else
+                    {
+                        string respuesta = operations.PagoPrestamoOrdinarioCliente(cuenta, numprestamo);
+                        if (!respuesta.Equals("ok"))
+                        {
+                            WriteResponse(respuesta);
+                        }
+                        else
+                        {
+                            WriteResponse("Pago creado correctamente");
+                        }
+                    }                    
                 }
                 #endregion
                 #region Prestamo
                 else if (request_instance == "prestamo")
                 {
-                    BancaTec.Prestamo pres = new BancaTec.Prestamo
+                    string cedcliente = context.Request["cedcliente"];
+                    Prestamo pres = new BancaTec.Prestamo
                     {
                         Interes = double.Parse(context.Request["interes"]),
-                        SaldoOrig = decimal.Parse(context.Request["saldoorig"]),
-                        SaldoActual = decimal.Parse(context.Request["saldoorig"]),
-                        CedCliente = context.Request["cedcliente"],
+                        SaldoOrig = decimal.Parse(context.Request["saldo"]),
+                        SaldoActual = decimal.Parse(context.Request["saldo"]),
+                        CedCliente = cedcliente,
                         CedAsesor = context.Request["cedasesor"],
                         Moneda = context.Request["moneda"]
                     };
                     Prestamo.AddPrestamo(pres);
+                    int meses = int.Parse(context.Request["meses"]);
+                    operations.GenerarCalendarioPagos(cedcliente, meses);
                     WriteResponse("Prestamo creado correctamente");
                 }
                 #endregion
@@ -683,8 +703,8 @@ namespace RestWebService
                     {
                         CodigoSeg = context.Request["codigoseg"].ToString() == "" ? random.ToString() : context.Request["codigoseg"],
                         FechaExp = DateTime.Parse(context.Request["fechaexp"]),
-                        SaldoActual = context.Request["tipo"] == "credito" ? decimal.Parse(context.Request["saldo"]) : 0,
-                        SaldoOrig = context.Request["tipo"] == "credito" ? decimal.Parse(context.Request["saldo"]) : 0,
+                        SaldoActual = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldo"]) : 0,
+                        SaldoOrig = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldo"]) : 0,
                         Tipo = context.Request["tipo"],
                         NumCuenta = int.Parse(context.Request["numcuenta"])
                     };
@@ -761,8 +781,8 @@ namespace RestWebService
                         Monto = decimal.Parse(context.Request["monto"]),
                         NumCuenta = int.Parse(context.Request["numcuenta"])
                     };
-                    Movimiento.AddMovimiento(movi);
-                    WriteResponse("Movimiento creado correctamente");
+                    string mensaje = operations.RealizarMovimiento(movi);
+                    WriteResponse(mensaje);
                 }
                 #endregion
                 #region Transferencialegacy
@@ -780,7 +800,29 @@ namespace RestWebService
                     WriteResponse("Transferencia creada correctamente");
                 }
                 #endregion
-
+                /*
+                #region Pago Tarjeta
+                else if (request_instance == "pagotarjeta")
+                {
+                    string numtarjeta = context.Request["numtarjeta"];
+                    if (numtarjeta == null)
+                    {
+                        WriteResponse("Ingrese el parametro numtarjeta");
+                    }
+                    else
+                    {
+                        string mensaje = operations.PagoTarjetaCliente(int.Parse(numtarjeta));
+                        if (mensaje.Equals("ok"))
+                        {
+                            WriteResponse("Tarjeta pagada correctamente");
+                        }
+                        else
+                        {
+                            WriteResponse(mensaje);
+                        }
+                    }
+                }
+                #endregion*/
                 #region Transferencia
                 else if (request_instance == "transferencia")
                 {
@@ -797,38 +839,6 @@ namespace RestWebService
                     {
                         WriteResponse(respuesta);
                     }
-                }
-                #endregion
-                #region Calendario de Pagos
-                else if (request_instance == "calendario")
-                {
-                    string numPrestamotemp = context.Request["numprestamo"];
-                    string mesestemp = context.Request["meses"];
-                    if (numPrestamotemp == null || mesestemp == null)
-                    {
-                        WriteResponse("Datos incorrectos o mal ingresados");
-                    }
-                    else
-                    {
-                        int numPrestamo = int.Parse(numPrestamotemp);
-                        int meses = int.Parse(mesestemp);
-                        string generado = operations.GenerarCalendarioPagos(numPrestamo, meses);
-                        if (generado.Equals("ok"))
-                        {
-                            WriteResponse("Operacion completada");
-                        }
-                        else
-                        {
-                            WriteResponse(generado);
-                        }
-                    }
-                }
-                #endregion
-
-                #region Pago Tarjeta
-                else if (request_instance == "l3m")
-                {
-                    fromL3M(context);
                 }
                 #endregion
             }
@@ -944,8 +954,8 @@ namespace RestWebService
                     {
                         CodigoSeg = context.Request["codigoseg"],
                         FechaExp = DateTime.Parse(context.Request["fechaexp"]),
-                        SaldoActual = context.Request["tipo"] == "credito" ? decimal.Parse(context.Request["saldoActual"]) : 0,
-                        SaldoOrig = context.Request["tipo"] == "credito" ? decimal.Parse(context.Request["saldoOrig"]) : 0,
+                        SaldoActual = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldoActual"]) : 0,
+                        SaldoOrig = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldoOrig"]) : 0,
                         Tipo = context.Request["tipo"],
                         NumCuenta = int.Parse(context.Request["numcuenta"]),
                         Numero = int.Parse(context.Request["numero"])

@@ -82,6 +82,12 @@ namespace TestHarness
             //string sehizo = operation.GenerarCalendarioPagos(8, 12);
             //decimal cambio = operation.CambioMoneda(1000.00M, "Colones", "Dolares");
             //Rol rol = Rol.GetRol("Gerente");
+
+
+            string cedula = "777777777";
+                List<Mora> listaMoras = operation.ReporteDeMora(cedula);
+                string serializedList = Serialize(listaMoras);
+
             Console.WriteLine();
         }
 

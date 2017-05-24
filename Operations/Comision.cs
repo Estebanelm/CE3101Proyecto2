@@ -9,13 +9,107 @@ namespace Operations
 {
     public class Comision
     {
-        private string NombreCompleto { get; set; }
-        private decimal MetaColones { get; set; }
-        private decimal MetaDolares { get; set; }
-        private decimal TotalColones { get; set; }
-        private decimal TotalDolares { get; set; }
-        private decimal ComisionColones { get; set; }
-        private decimal ComisionDolares { get; set; }
+        public Comision()
+        { }
+
+        private string nombreCompleto;
+        private decimal metaColones; 
+        private decimal metaDolares;
+        private decimal totalColones;
+        private decimal totalDolares;
+        private decimal comisionColones;
+        private decimal comisionDolares;
+
+        public string NombreCompleto
+        {
+            get
+            {
+                return nombreCompleto;
+            }
+
+            set
+            {
+                nombreCompleto = value;
+            }
+        }
+
+        public decimal MetaColones
+        {
+            get
+            {
+                return metaColones;
+            }
+
+            set
+            {
+                metaColones = value;
+            }
+        }
+
+        public decimal MetaDolares
+        {
+            get
+            {
+                return metaDolares;
+            }
+
+            set
+            {
+                metaDolares = value;
+            }
+        }
+
+        public decimal TotalColones
+        {
+            get
+            {
+                return totalColones;
+            }
+
+            set
+            {
+                totalColones = value;
+            }
+        }
+
+        public decimal TotalDolares
+        {
+            get
+            {
+                return totalDolares;
+            }
+
+            set
+            {
+                totalDolares = value;
+            }
+        }
+
+        public decimal ComisionColones
+        {
+            get
+            {
+                return comisionColones;
+            }
+
+            set
+            {
+                comisionColones = value;
+            }
+        }
+
+        public decimal ComisionDolares
+        {
+            get
+            {
+                return comisionDolares;
+            }
+
+            set
+            {
+                comisionDolares = value;
+            }
+        }
 
         public Comision(NpgsqlDataReader dr)
         {

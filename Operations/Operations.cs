@@ -66,19 +66,29 @@ namespace Operations
             }
         }
 
-        public string GenerarCalendarioPagos(int numPrestamo, int meses)
+        public string GenerarCalendarioPagos(string cedula, int meses)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 // Connect to a PostgreSQL database
                 conn.Open();
-                List<Comision> listaComisiones = new List<Comision>();
-                string commandString = string.Format("SELECT \"calendariopagos\"({0}, {1})", numPrestamo.ToString(), meses.ToString());
+                NpgsqlCommand command = new NpgsqlCommand();
+                command.Connection = conn;
+
+                string getPrestamo = "SELECT MAX(\"Numero\") FROM \"PRESTAMO\" WHERE \"CedCliente\"='" + cedula + "';";
+                command.CommandText = getPrestamo;
+                NpgsqlDataReader dr1 = command.ExecuteReader();
+                dr1.Read();
+                string numPrestamost = dr1[0].ToString();
+                int numPrestamo = int.Parse(numPrestamost);
+                dr1.Close();
+                List <Comision> listaComisiones = new List<Comision>();
+                string commandString = string.Format("SELECT * FROM \"calendariopagos\"({0}, {1})", numPrestamo.ToString(), meses.ToString());
                 // Define a query returning a single row result set
-                NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
 
                 // Execute the query and obtain the value of the first column of the first row
                 //Int64 count = (Int64)command.ExecuteScalar();
+                command.CommandText = commandString;
                 NpgsqlDataReader dr = command.ExecuteReader();
 
                 dr.Read();
@@ -94,7 +104,7 @@ namespace Operations
                 // Connect to a PostgreSQL database
                 conn.Open();
                 List<Mora> listaMoras = new List<Mora>();
-                string commandString = string.Format("SELECT * FROM \"reportedemora\"({0})", cedula);
+                string commandString = string.Format("SELECT * FROM \"reportedemora\"('{0}');", cedula);
                 // Define a query returning a single row result set
                 NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
 
@@ -117,7 +127,7 @@ namespace Operations
                 // Connect to a PostgreSQL database
                 conn.Open();
                 List<MoraFechas> listaMoras = new List<MoraFechas>();
-                string commandString = string.Format("SELECT * FROM \"reportedemorafechas\"({0})", cedula);
+                string commandString = string.Format("SELECT * FROM \"reportedemorafechas\"('{0}')", cedula);
                 // Define a query returning a single row result set
                 NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
 
@@ -167,6 +177,69 @@ namespace Operations
 
                 dr.Read();
                 string respuesta = dr["calendariopagos"].ToString();
+                return respuesta;
+            }
+        }
+
+        public string PagoPrestamoOrdinarioCliente(int cuenta, int prestamo)
+        {
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                // Connect to a PostgreSQL database
+                conn.Open();
+                List<Comision> listaComisiones = new List<Comision>();
+                string commandString = string.Format("SELECT \"pagoprestamoordinariocliente\"({0}, {1})", cuenta.ToString(), prestamo.ToString());
+                // Define a query returning a single row result set
+                NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
+
+                // Execute the query and obtain the value of the first column of the first row
+                //Int64 count = (Int64)command.ExecuteScalar();
+                NpgsqlDataReader dr = command.ExecuteReader();
+
+                dr.Read();
+                string respuesta = dr["pagoprestamoordinariocliente"].ToString();
+                return respuesta;
+            }
+        }
+
+        public string PagoPrestamoExtraordinarioCliente(int cuenta, int prestamo, int extra)
+        {
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                // Connect to a PostgreSQL database
+                conn.Open();
+                List<Comision> listaComisiones = new List<Comision>();
+                string commandString = string.Format("SELECT \"pagoprestamoextraordinariocliente\"({0}, {1}, {2})", cuenta.ToString(), prestamo.ToString(), extra.ToString());
+                // Define a query returning a single row result set
+                NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
+
+                // Execute the query and obtain the value of the first column of the first row
+                //Int64 count = (Int64)command.ExecuteScalar();
+                NpgsqlDataReader dr = command.ExecuteReader();
+
+                dr.Read();
+                string respuesta = dr["pagoprestamoextraordinariocliente"].ToString();
+                return respuesta;
+            }
+        }
+
+        public string RealizarMovimiento(Movimiento mov)
+        {
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                // Connect to a PostgreSQL database
+                conn.Open();
+                List<Comision> listaComisiones = new List<Comision>();
+                string commandString = string.Format("SELECT \"realizarmovimiento\"('{0}', '{1}', {2}, {3})", mov.Tipo, mov.Moneda, mov.Monto.ToString(), mov.NumCuenta.ToString());
+                // Define a query returning a single row result set
+                NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
+
+                // Execute the query and obtain the value of the first column of the first row
+                //Int64 count = (Int64)command.ExecuteScalar();
+                NpgsqlDataReader dr = command.ExecuteReader();
+
+                dr.Read();
+                string respuesta = dr["realizarmovimiento"].ToString();
                 return respuesta;
             }
         }
