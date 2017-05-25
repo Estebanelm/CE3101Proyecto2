@@ -98,13 +98,20 @@ namespace BancaTec
                 var prestamo = db.Prestamo
                                 .Where(b => b.Numero == numeroPrestamo)
                                 .FirstOrDefault();
-                if (prestamo != null)
+                if (prestamo.SaldoActual == 0)
                 {
-                    prestamo.Estado = 'I';
+                    if (prestamo != null)
+                    {
+                        prestamo.Estado = 'I';
+                    }
+                    else
+                    {
+                        throw (new Exception("No se encontro instancia"));
+                    }
                 }
                 else
                 {
-                    throw (new Exception("No se encontro instancia"));
+                    throw (new Exception("Tiene saldos pendientes"));
                 }
                 db.SaveChanges();
             }

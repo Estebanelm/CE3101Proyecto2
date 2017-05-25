@@ -114,6 +114,11 @@ namespace BancaTec
                 var empleado = db.Empleado
                                 .Where(b => b.Cedula == cedula)
                                 .FirstOrDefault();
+                var empleadosrol = empleado.EmpleadoRol;
+                foreach (var item in empleadosrol)
+                {
+                    item.Estado = 'I';
+                }
                 if (empleado != null)
                 {
                     empleado.Estado = 'I';

@@ -27,7 +27,7 @@ namespace BancaTec
             using (var db = new BancaTecContext())
             {
                 var listatransferencias = db.Transferencia
-                    .Where(b => b.CuentaEmisora == numcuenta && b.CuentaReceptora == numcuenta && b.Estado.Equals('A'));
+                    .Where(b => (b.CuentaEmisora == numcuenta || b.CuentaReceptora == numcuenta) && b.Estado.Equals('A'));
                 foreach (var movimiento in listatransferencias)
                 {
                     listatransferenciasobj.Add(movimiento);

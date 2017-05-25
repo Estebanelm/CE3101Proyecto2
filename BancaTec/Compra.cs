@@ -19,13 +19,13 @@ namespace BancaTec
         [XmlIgnore]
         public virtual Tarjeta NumTarjetaNavigation { get; set; }
 
-        public static List<Compra> GetCompras(int numtarjeta)
+        public static List<Compra> GetCompras(int numtarjeta, DateTime fechainicial, DateTime fechafinal)
         {
             List<Compra> listacompraobj = new List<Compra>();
             using (var db = new BancaTecContext())
             {
                 var listacompra = db.Compra
-                    .Where(b => b.NumTarjeta == numtarjeta && b.Estado.Equals('A'));
+                    .Where(b => b.NumTarjeta == numtarjeta && b.Estado.Equals('A') && b.Fecha >= fechainicial && b.Fecha <= fechafinal);
                 foreach (var compra in listacompra)
                 {
                     listacompraobj.Add(compra);

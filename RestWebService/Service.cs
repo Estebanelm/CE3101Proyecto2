@@ -310,18 +310,36 @@ namespace RestWebService
                 else if (request_instance == "tarjeta")
                 {
                     string _numtemp = context.Request["numero"];
+                    string cuentatemp = context.Request["numcuenta"];
                     if (_numtemp == null)
                     {
-                        List<BancaTec.Tarjeta> lista_tarjetas = Tarjeta.GetTarjetas();
-                        if (lista_tarjetas.Count == 0)
+                        if (cuentatemp == null)
                         {
-                            WriteResponse("No se encontraron tarjetas");
+                            List<BancaTec.Tarjeta> lista_tarjetas = Tarjeta.GetTarjetas();
+                            if (lista_tarjetas.Count == 0)
+                            {
+                                WriteResponse("No se encontraron tarjetas");
+                            }
+                            else
+                            {
+                                string serializedList = Serialize(lista_tarjetas);
+                                context.Response.ContentType = "text/xml";
+                                WriteResponse(serializedList);
+                            }
                         }
                         else
                         {
-                            string serializedList = Serialize(lista_tarjetas);
-                            context.Response.ContentType = "text/xml";
-                            WriteResponse(serializedList);
+                            List<Tarjeta> listatarjes = Tarjeta.GetTarjetas(int.Parse(cuentatemp));
+                            if (listatarjes.Count == 0)
+                            {
+                                WriteResponse("No se encontraron tarjetas para esa cuenta");
+                            }
+                            else
+                            {
+                                string serializedList = Serialize(listatarjes);
+                                context.Response.ContentType = "text/xml";
+                                WriteResponse(serializedList);
+                            }
                         }
                     }
                     else
@@ -386,6 +404,8 @@ namespace RestWebService
                 else if (request_instance == "compra")
                 {
                     string numtarjetemp = context.Request["numtarjeta"];
+                    string fechainicialtemp = context.Request["fechainicial"];
+                    string fechafinaltemp = context.Request["fechafinal"];
                     if (numtarjetemp == null)
                     {
                         List<BancaTec.Compra> lista_compras = Compra.GetCompras();
@@ -403,12 +423,14 @@ namespace RestWebService
                     else
                     {
                         int numtarjeta = int.Parse(numtarjetemp);
+                        DateTime fechainicial = DateTime.Parse(fechainicialtemp);
+                        DateTime fechafinal = DateTime.Parse(fechafinaltemp);
                         //HTTP Request Type - GET"
                         //Performing Operation - READ"
-                        List<BancaTec.Compra> compra = Compra.GetCompras(numtarjeta);
+                        List<BancaTec.Compra> compra = Compra.GetCompras(numtarjeta, fechainicial, fechafinal);
                         if (compra.Count == 0)
                         {
-                            context.Response.Write(numtarjeta + "No Compras Found" + numtarjetemp);
+                            context.Response.Write("No se encontraron compras registradas para esa tarjeta");
                         }
                         else
                         {
@@ -457,7 +479,7 @@ namespace RestWebService
                     }
                 }
                 #endregion
-                #region
+                #region empleado rol
                 else if (request_instance == "empleadorol")
                 {
                     string cedula = context.Request["cedulaempleado"];
@@ -654,19 +676,52 @@ namespace RestWebService
                         CedCliente = context.Request["cedcliente"],
                         Saldo = decimal.Parse(context.Request["saldo"])
                     };
-                    Cuenta.AddCuenta(cuen);
-                    WriteResponse("Cuenta creada correctamente");
+                    Cliente clie = Cliente.GetCliente(context.Request["cedcliente"]);
+                    if (clie == null)
+                    {
+                        WriteResponse("El cliente fue eliminado o no existe");
+                    }
+                    else
+                    {
+                        Cuenta.AddCuenta(cuen);
+                        WriteResponse("Cuenta creada correctamente");
+                    }
                 }
                 #endregion
                 #region Pago
                 else if (request_instance == "pago")
                 {
-                    int cuenta = int.Parse(context.Request["cuenta"]);
+                    string cuentatemp = context.Request["cuenta"];
+                    string efectivotemp = context.Request["efectivo"];
+                    int efectivo;
+                    if (efectivotemp==null)
+                    {
+                        efectivo = 0;
+                    }
+                    else
+                    {
+                        efectivo = 1;
+                    }
+                    int cuenta;
+                    if (cuentatemp == null && efectivo == 0)
+                    {
+                        cuenta = -1;
+                    }
+                    else
+                    {
+                        cuenta = int.Parse(cuentatemp);
+                    }
                     int numprestamo = int.Parse(context.Request["numprestamo"]);
                     if (context.Request["extra"] != null)
                     {
                         int extra = int.Parse(context.Request["extra"]);
-                        string respuesta = operations.PagoPrestamoExtraordinarioCliente(cuenta, numprestamo, extra);
+                        string moneda = context.Request["moneda"];
+                        if (moneda == null)
+                        {
+                            Prestamo prest = Prestamo.GetPrestamo(numprestamo);
+                            moneda = prest.Moneda;
+                        }
+                        string respuesta = operations.PagoPrestamoExtraordinarioCliente(cuenta, numprestamo, extra, moneda, efectivo);
                         if (!respuesta.Equals("ok"))
                         {
                             WriteResponse(respuesta);
@@ -678,7 +733,7 @@ namespace RestWebService
                     }
                     else
                     {
-                        string respuesta = operations.PagoPrestamoOrdinarioCliente(cuenta, numprestamo);
+                        string respuesta = operations.PagoPrestamoOrdinarioCliente(cuenta, numprestamo, efectivo);
                         if (!respuesta.Equals("ok"))
                         {
                             WriteResponse(respuesta);
@@ -703,10 +758,19 @@ namespace RestWebService
                         CedAsesor = context.Request["cedasesor"],
                         Moneda = context.Request["moneda"]
                     };
-                    Prestamo.AddPrestamo(pres);
-                    int meses = int.Parse(context.Request["meses"]);
-                    operations.GenerarCalendarioPagos(cedcliente, meses);
-                    WriteResponse("Prestamo creado correctamente");
+                    Cliente clie = Cliente.GetCliente(context.Request["cedcliente"]);
+                    Asesor ase = Asesor.GetAsesor(context.Request["cedasesor"]);
+                    if (clie == null || ase == null)
+                    {
+                        WriteResponse("El asesor o cliente fue eliminado o no existe");
+                    }
+                    else
+                    {
+                        Prestamo.AddPrestamo(pres);
+                        int meses = int.Parse(context.Request["meses"]);
+                        operations.GenerarCalendarioPagos(cedcliente, meses);
+                        WriteResponse("Prestamo creado correctamente");
+                    }
                 }
                 #endregion
                 #region Tarjeta
@@ -723,8 +787,16 @@ namespace RestWebService
                         Tipo = context.Request["tipo"],
                         NumCuenta = int.Parse(context.Request["numcuenta"])
                     };
-                    Tarjeta.AddTarjeta(tarj);
-                    WriteResponse("Tarjeta creada correctamente");
+                    Cuenta cuen = Cuenta.GetCuenta(tarj.NumCuenta);
+                    if (cuen == null)
+                    {
+                        WriteResponse("La cuenta no existe o fue eliminada");
+                    }
+                    else
+                    {
+                        Tarjeta.AddTarjeta(tarj);
+                        WriteResponse("Tarjeta creada correctamente");
+                    }
                 }
                 #endregion
                 #region Rol
@@ -796,8 +868,16 @@ namespace RestWebService
                         Monto = decimal.Parse(context.Request["monto"]),
                         NumCuenta = int.Parse(context.Request["numcuenta"])
                     };
-                    string mensaje = operations.RealizarMovimiento(movi);
-                    WriteResponse(mensaje);
+                    Cuenta cuent = Cuenta.GetCuenta(movi.NumCuenta);
+                    if (cuent == null)
+                    {
+                        WriteResponse("La cuenta ingresada no existe");
+                    }
+                    else
+                    {
+                        string mensaje = operations.RealizarMovimiento(movi);
+                        WriteResponse(mensaje);
+                    }
                 }
                 #endregion
                 #region Transferencialegacy
@@ -815,29 +895,53 @@ namespace RestWebService
                     WriteResponse("Transferencia creada correctamente");
                 }
                 #endregion
-                /*
                 #region Pago Tarjeta
-                else if (request_instance == "pagotarjeta")
+                else if (request_instance == "cancelartarjeta")
                 {
                     string numtarjeta = context.Request["numtarjeta"];
+                    string montotemp = context.Request["monto"];
                     if (numtarjeta == null)
                     {
                         WriteResponse("Ingrese el parametro numtarjeta");
                     }
                     else
                     {
-                        string mensaje = operations.PagoTarjetaCliente(int.Parse(numtarjeta));
-                        if (mensaje.Equals("ok"))
+                        Tarjeta tarje = Tarjeta.GetTarjeta(int.Parse(numtarjeta));
+                        if (tarje == null)
                         {
-                            WriteResponse("Tarjeta pagada correctamente");
+                            WriteResponse("La tarjeta indicada no existe");
                         }
                         else
                         {
-                            WriteResponse(mensaje);
+                            if (tarje.Tipo.Equals("Debito"))
+                            {
+                                WriteResponse("Solo se pueden cancelar tarjetas de credito");
+                            }
+                            else
+                            {
+                                decimal monto;
+                                if (montotemp == null)
+                                {
+                                    monto = (decimal)(tarje.SaldoOrig - tarje.SaldoActual);
+                                }
+                                else
+                                {
+                                    monto = decimal.Parse(montotemp);
+                                }
+                                string mensaje = operations.PagoTarjetaCliente(int.Parse(numtarjeta), monto);
+                                if (mensaje.Equals("ok"))
+                                {
+                                    WriteResponse("Tarjeta pagada correctamente");
+                                }
+                                else
+                                {
+                                    WriteResponse(mensaje);
+                                }
+                            }
                         }
                     }
                 }
-                #endregion*/
+                #endregion
                 #region Transferencia
                 else if (request_instance == "transferencia")
                 {
@@ -889,8 +993,16 @@ namespace RestWebService
                         MetaColones = decimal.Parse(context.Request["metacolones"]),
                         MetaDolares = decimal.Parse(context.Request["metadolares"])
                     };
-                    Asesor.UpdateAsesor(ase);
-                    WriteResponse("Asesor modificado correctamente");
+                    Asesor aseso = Asesor.GetAsesor(ase.Cedula);
+                    if (aseso == null || aseso.Estado.Equals('I'))
+                    {
+                        WriteResponse("El asesor ingresado no existe");
+                    }
+                    else
+                    {
+                        Asesor.UpdateAsesor(ase);
+                        WriteResponse("Asesor modificado correctamente");
+                    }
                 }
                 #endregion
                 #region Cliente
@@ -910,8 +1022,16 @@ namespace RestWebService
                         Contrasena = context.Request["contrasena"],
                         Moneda = context.Request["moneda"]
                     };
-                    Cliente.UpdateCliente(clie);
-                    WriteResponse("Cliente modificado correctamente");
+                    Cliente clien = Cliente.GetCliente(clie.Cedula);
+                    if (clien == null || clien.Estado.Equals('I'))
+                    {
+                        WriteResponse("El cliente no existe");
+                    }
+                    else
+                    {
+                        Cliente.UpdateCliente(clie);
+                        WriteResponse("Cliente modificado correctamente");
+                    }
                 }
                 #endregion
                 #region Cuenta
@@ -926,8 +1046,16 @@ namespace RestWebService
                         NumCuenta = int.Parse(context.Request["numcuenta"]),
                         Saldo = decimal.Parse(context.Request["saldo"])
                     };
-                    Cuenta.UpdateCuenta(cuen);
-                    WriteResponse("Cuenta modificada correctamente");
+                    Cuenta cuent = Cuenta.GetCuenta(cuen.NumCuenta);
+                    if (cuent == null || cuent.Estado.Equals('I'))
+                    {
+                        WriteResponse("La cuenta no existe");
+                    }
+                    else
+                    {
+                        Cuenta.UpdateCuenta(cuen);
+                        WriteResponse("Cuenta modificada correctamente");
+                    }
                 }
                 #endregion
                 #region Pago
@@ -965,18 +1093,26 @@ namespace RestWebService
                 #region Tarjeta
                 else if (request_instance == "tarjeta")
                 {
-                    BancaTec.Tarjeta tarj = new BancaTec.Tarjeta
+                    Tarjeta tarjetilla = Tarjeta.GetTarjeta(int.Parse(context.Request["numero"]));
+                    if (tarjetilla == null || tarjetilla.Estado.Equals('I'))
                     {
-                        CodigoSeg = context.Request["codigoseg"],
-                        FechaExp = DateTime.Parse(context.Request["fechaexp"]),
-                        SaldoActual = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldoActual"]) : 0,
-                        SaldoOrig = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldoOrig"]) : 0,
-                        Tipo = context.Request["tipo"],
-                        NumCuenta = int.Parse(context.Request["numcuenta"]),
-                        Numero = int.Parse(context.Request["numero"])
-                    };
-                    Tarjeta.UpdateTarjeta(tarj);
-                    WriteResponse("Tarjeta modificada correctamente");
+                        WriteResponse("La tarjeta ingresada no existe");
+                    }
+                    else
+                    {
+                        BancaTec.Tarjeta tarj = new BancaTec.Tarjeta
+                        {
+                            CodigoSeg = context.Request["codigoseg"],
+                            FechaExp = DateTime.Parse(context.Request["fechaexp"]),
+                            SaldoActual = context.Request["tipo"] == "Credito" ? tarjetilla.SaldoActual : 0,
+                            SaldoOrig = context.Request["tipo"] == "Credito" ? decimal.Parse(context.Request["saldoOrig"]) : 0,
+                            Tipo = context.Request["tipo"],
+                            NumCuenta = int.Parse(context.Request["numcuenta"]),
+                            Numero = int.Parse(context.Request["numero"])
+                        };
+                        Tarjeta.UpdateTarjeta(tarj);
+                        WriteResponse("Tarjeta modificada correctamente");
+                    }
                 }
                 #endregion
                 #region Rol
@@ -987,8 +1123,16 @@ namespace RestWebService
                         Nombre = context.Request["nombre"],
                         Descripcion = context.Request["descripcion"]
                     };
-                    Rol.UpdateRol(rol);
-                    WriteResponse("Rol modificado correctamente");
+                    Rol rola = Rol.GetRol(rol.Nombre);
+                    if (rola == null || rola.Estado.Equals('I'))
+                    {
+                        WriteResponse("El rol no existe");
+                    }
+                    else
+                    {
+                        Rol.UpdateRol(rol);
+                        WriteResponse("Rol modificado correctamente");
+                    }
                 }
                 #endregion
                 #region Compra
@@ -1019,8 +1163,16 @@ namespace RestWebService
                         SegApellido = context.Request["segapellido"],
                         Contrasena = context.Request["contrasena"]
                     };
-                    Empleado.UpdateEmpleado(emple);
-                    WriteResponse("Empleado modificado correctamente");
+                    Empleado emplea = Empleado.GetEmpleado(emple.Cedula);
+                    if (emplea == null || emplea.Estado.Equals('I'))
+                    {
+                        WriteResponse("El empleado no existe");
+                    }
+                    else
+                    {
+                        Empleado.UpdateEmpleado(emple);
+                        WriteResponse("Empleado modificado correctamente");
+                    }
                 }
                 #endregion
                 #region Movimiento
@@ -1123,8 +1275,16 @@ namespace RestWebService
                 {
                     string _numero_temp = context.Request["numero"];
                     int _numero = int.Parse(_numero_temp);
-                    Tarjeta.DeleteTarjeta(_numero);
-                    WriteResponse("Tarjeta eliminada");
+                    Tarjeta tarje = Tarjeta.GetTarjeta(_numero);
+                    if (tarje.Tipo.Equals("Credito") && tarje.SaldoActual > 0)
+                    {
+                        WriteResponse("No se puede eliminar la tarjeta porque tiene saldos pendientes");
+                    }
+                    else
+                    {
+                        Tarjeta.DeleteTarjeta(_numero);
+                        WriteResponse("Tarjeta eliminada");
+                    }
                 }
                 #endregion
                 #region Rol
@@ -1241,6 +1401,8 @@ namespace RestWebService
                             Fecha = DateTime.Now
                         };
                         Compra.AddCompra(comp);
+                        tarje.SaldoActual = tarje.SaldoActual - decimal.Parse(monto);
+                        Tarjeta.UpdateTarjeta(tarje);
                         el.SetAttribute("mensaje", "ok");
                         Console.WriteLine(doc.OuterXml);
                         WriteResponse(doc.OuterXml);
@@ -1265,6 +1427,8 @@ namespace RestWebService
                             Fecha = DateTime.Now
                         };
                         Compra.AddCompra(comp);
+                        cuenta.Saldo = cuenta.Saldo - decimal.Parse(monto);
+                        Cuenta.UpdateCuenta(cuenta);
                         el.SetAttribute("mensaje", "ok");
                         Console.WriteLine(doc.OuterXml);
                         WriteResponse(doc.OuterXml);

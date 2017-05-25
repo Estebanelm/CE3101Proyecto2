@@ -58,6 +58,22 @@ namespace BancaTec
             return lista_tarjetas;
         }
 
+
+        public static List<Tarjeta> GetTarjetas(int cuenta)
+        {
+            List<Tarjeta> lista_tarjetas = new List<Tarjeta>();
+            using (var db = new BancaTecContext())
+            {
+                foreach (var tarjeta in db.Tarjeta)
+                {
+                    if (tarjeta.Estado == 'A' && tarjeta.NumCuenta == cuenta)
+                    {
+                        lista_tarjetas.Add(tarjeta);
+                    }
+                }
+            }
+            return lista_tarjetas;
+        }
         public static void AddTarjeta(Tarjeta tarj)
         {
             using (var db = new BancaTecContext())
@@ -99,6 +115,10 @@ namespace BancaTec
                 var tarjeta = db.Tarjeta
                                 .Where(b => b.Numero == numero)
                                 .FirstOrDefault();
+                if (tarjeta.Tipo.Equals("Credito") && tarjeta.SaldoActual < tarjeta.SaldoOrig)
+                {
+                    throw (new Exception("Una tarjeta tiene saldos pendientes"));
+                }
                 if (tarjeta != null)
                 {
                     tarjeta.Estado = 'I';

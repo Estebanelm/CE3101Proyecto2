@@ -124,6 +124,16 @@ namespace BancaTec
                 var cliente = db.Cliente
                                 .Where(b => b.Cedula == cedula)
                                 .FirstOrDefault();
+                var prestamos = cliente.Prestamo;
+                var cuentas = cliente.Cuenta;
+                foreach (var cuenta in cuentas)
+                {
+                    BancaTec.Cuenta.DeleteCuenta(cuenta.NumCuenta);
+                }
+                foreach (var item in prestamos)
+                {
+                    BancaTec.Prestamo.DeletePrestamo(item.Numero);
+                }
                 if (cliente != null)
                 {
                     cliente.Estado = 'I';

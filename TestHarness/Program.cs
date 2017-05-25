@@ -77,16 +77,7 @@ namespace TestHarness
             //Cuenta.AddCuenta(cuenta);
 
             Operations.Operations operation = new Operations.Operations("Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017");
-            decimal asd = operation.PMT(2.1, 12, 1000000);
-            //List<Comision> lista = operation.ReporteComisiones();
-            //string sehizo = operation.GenerarCalendarioPagos(8, 12);
-            //decimal cambio = operation.CambioMoneda(1000.00M, "Colones", "Dolares");
-            //Rol rol = Rol.GetRol("Gerente");
-
-
-            string cedula = "777777777";
-                List<Mora> listaMoras = operation.ReporteDeMora(cedula);
-                string serializedList = Serialize(listaMoras);
+            
 
             Console.WriteLine();
         }

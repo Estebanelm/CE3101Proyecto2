@@ -176,19 +176,27 @@ namespace Operations
                 NpgsqlDataReader dr = command.ExecuteReader();
 
                 dr.Read();
-                string respuesta = dr["calendariopagos"].ToString();
+                string respuesta = dr["transferencia"].ToString();
                 return respuesta;
             }
         }
 
-        public string PagoPrestamoOrdinarioCliente(int cuenta, int prestamo)
+        public string PagoPrestamoOrdinarioCliente(int cuenta, int prestamo, int efectivo)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 // Connect to a PostgreSQL database
                 conn.Open();
                 List<Comision> listaComisiones = new List<Comision>();
-                string commandString = string.Format("SELECT \"pagoprestamoordinariocliente\"({0}, {1})", cuenta.ToString(), prestamo.ToString());
+                string commandString;
+                if (efectivo == 0)
+                {
+                    commandString = string.Format("SELECT \"pagoprestamoordinariocliente\"({0}, {1})", cuenta.ToString(), prestamo.ToString());
+                }
+                else
+                {
+                    commandString = string.Format("SELECT \"pagoprestamoordinarioadmi\"({0})", prestamo.ToString());
+                }
                 // Define a query returning a single row result set
                 NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
 
@@ -197,19 +205,35 @@ namespace Operations
                 NpgsqlDataReader dr = command.ExecuteReader();
 
                 dr.Read();
-                string respuesta = dr["pagoprestamoordinariocliente"].ToString();
+                string respuesta;
+                if (efectivo == 0)
+                {
+                    respuesta = dr["pagoprestamoordinariocliente"].ToString();
+                }
+                else
+                {
+                    respuesta = dr["pagoprestamoordinarioadmi"].ToString();
+                }
                 return respuesta;
             }
         }
 
-        public string PagoPrestamoExtraordinarioCliente(int cuenta, int prestamo, int extra)
+        public string PagoPrestamoExtraordinarioCliente(int cuenta, int prestamo, int extra, string moneda, int efectivo)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 // Connect to a PostgreSQL database
                 conn.Open();
                 List<Comision> listaComisiones = new List<Comision>();
-                string commandString = string.Format("SELECT \"pagoprestamoextraordinariocliente\"({0}, {1}, {2})", cuenta.ToString(), prestamo.ToString(), extra.ToString());
+                string commandString;
+                if (efectivo == 0)
+                {
+                    commandString = string.Format("SELECT \"pagoprestamoextraordinariocliente\"({0}, {1}, {2}, '{3}')", cuenta.ToString(), prestamo.ToString(), extra.ToString(), moneda);
+                }
+                else
+                {
+                    commandString = string.Format("SELECT \"pagoprestamoextraordinarioadmi\"({0}, {1}, '{3}')", prestamo.ToString(), extra.ToString(), moneda);
+                }
                 // Define a query returning a single row result set
                 NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
 
@@ -218,7 +242,15 @@ namespace Operations
                 NpgsqlDataReader dr = command.ExecuteReader();
 
                 dr.Read();
-                string respuesta = dr["pagoprestamoextraordinariocliente"].ToString();
+                string respuesta;
+                if (efectivo == 0)
+                {
+                    respuesta = dr["pagoprestamoextraordinariocliente"].ToString();
+                }
+                else
+                {
+                    respuesta = dr["pagoprestamoextraordinarioadmi"].ToString();
+                }
                 return respuesta;
             }
         }
@@ -240,6 +272,27 @@ namespace Operations
 
                 dr.Read();
                 string respuesta = dr["realizarmovimiento"].ToString();
+                return respuesta;
+            }
+        }
+
+        public string PagoTarjetaCliente(int numtarjeta, decimal monto)
+        {
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                // Connect to a PostgreSQL database
+                conn.Open();
+                List<Comision> listaComisiones = new List<Comision>();
+                string commandString = string.Format("SELECT \"pagotarjeta\"({0}, {1})", numtarjeta.ToString(), monto.ToString());
+                // Define a query returning a single row result set
+                NpgsqlCommand command = new NpgsqlCommand(commandString, conn);
+
+                // Execute the query and obtain the value of the first column of the first row
+                //Int64 count = (Int64)command.ExecuteScalar();
+                NpgsqlDataReader dr = command.ExecuteReader();
+
+                dr.Read();
+                string respuesta = dr["pagotarjeta"].ToString();
                 return respuesta;
             }
         }

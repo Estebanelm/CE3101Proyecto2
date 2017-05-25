@@ -120,6 +120,11 @@ namespace BancaTec
                 var cuenta = db.Cuenta
                                 .Where(b => b.NumCuenta == numero)
                                 .FirstOrDefault();
+                var tarjetas = cuenta.Tarjeta;
+                foreach (var item in tarjetas)
+                {
+                    BancaTec.Tarjeta.DeleteTarjeta(item.Numero);
+                }
                 if (cuenta != null)
                 {
                     cuenta.Estado = 'I';
