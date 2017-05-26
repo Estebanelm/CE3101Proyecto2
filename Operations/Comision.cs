@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Operations
 {
+    //Esta clase es usada para serializarla a la hora de reportar todas las comisiones
     public class Comision
     {
         public Comision()
         { }
 
+        //atributos de la clase y que se van a mostrar en la web.
         private string nombreCompleto;
         private decimal metaColones; 
         private decimal metaDolares;
