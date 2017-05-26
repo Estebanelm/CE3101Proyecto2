@@ -8,6 +8,8 @@ using System.Xml.Serialization;
 
 namespace Operations
 {
+    //Clase utilizada para reportar los pagos faltantes. Tiene diferencias con la clase pago en
+    //el atributo vencidas y el nombre completo
     public class Mora
     {
         public Mora()
