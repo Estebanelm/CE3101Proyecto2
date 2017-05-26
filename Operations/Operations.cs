@@ -23,6 +23,8 @@ namespace Operations
             connString = _connString;
         }
 
+        //Funcion PMT para calcular pagos de prestamos. En este caso solo se llama al store procedure con los parametros
+        //que son requeridos.
         public decimal PMT(double interest, int numPeriods, double prevValue)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -43,6 +45,7 @@ namespace Operations
             }
         }
 
+        //llama al store procedure que genera las comisiones y genera la lista
         public List<Comision> ReporteComisiones()
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -66,6 +69,7 @@ namespace Operations
             }
         }
 
+        //llama al store procedure que genera el calendario de pagos
         public string GenerarCalendarioPagos(string cedula, int meses)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -97,6 +101,8 @@ namespace Operations
             }
         }
 
+        //llama al store procedure que obtene los pagos pendientes. Obtiene los resultados
+        //de este y genera la lista.
         public List<Mora> ReporteDeMora(string cedula)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -120,6 +126,7 @@ namespace Operations
             }
         }
 
+        //hace lo mismo que el pasado pero agrega fechas especificas
         public List<MoraFechas> ReporteDeMoraFechas(string cedula)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -143,6 +150,7 @@ namespace Operations
             }
         }
 
+        //llama al store procedure para cambio de moneda
         public decimal CambioMoneda(decimal entrada, string inicial, string fin)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -160,6 +168,7 @@ namespace Operations
             }
         }
 
+        //llama al store procedure para realizar transferencias
         public string RealizarTransferencia(decimal monto, int emisora, int receptora, string moneda)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -181,6 +190,7 @@ namespace Operations
             }
         }
 
+        //pago de prestamo utilizando la cuenta
         public string PagoPrestamoOrdinarioCliente(int cuenta, int prestamo, int efectivo)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -218,6 +228,7 @@ namespace Operations
             }
         }
 
+        //pago de prestamo utilizando efectivo
         public string PagoPrestamoExtraordinarioCliente(int cuenta, int prestamo, int extra, string moneda, int efectivo)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -255,6 +266,7 @@ namespace Operations
             }
         }
 
+        //realiza movimientos entre tarjetas
         public string RealizarMovimiento(Movimiento mov)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -276,6 +288,7 @@ namespace Operations
             }
         }
 
+        //realiza pago de tarjeta
         public string PagoTarjetaCliente(int numtarjeta, decimal monto)
         {
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
