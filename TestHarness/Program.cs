@@ -17,8 +17,8 @@ using Microsoft.EntityFrameworkCore;
 // functionalities. Comment / uncomment as needed
 namespace TestHarness
 {
-    class Program    {   
-        
+    class Program    {
+
         static void Main(string[] args)
         {
             //Empleado emp = new Empleado();
@@ -77,7 +77,48 @@ namespace TestHarness
             //Cuenta.AddCuenta(cuenta);
 
             Operations.Operations operation = new Operations.Operations("Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017");
-            
+            string numtarjeta = "14";
+            string montotemp = "2";
+            if (numtarjeta == null)
+            {
+                Console.WriteLine("Ingrese el parametro numtarjeta");
+            }
+            else
+            {
+                Tarjeta tarje = Tarjeta.GetTarjeta(int.Parse(numtarjeta));
+                if (tarje == null)
+                {
+                    Console.WriteLine("La tarjeta indicada no existe");
+                }
+                else
+                {
+                    if (tarje.Tipo.Equals("Debito"))
+                    {
+                        Console.WriteLine("Solo se pueden cancelar tarjetas de credito");
+                    }
+                    else
+                    {
+                        decimal monto;
+                        if (montotemp == null)
+                        {
+                            monto = (decimal)(tarje.SaldoOrig - tarje.SaldoActual);
+                        }
+                        else
+                        {
+                            monto = decimal.Parse(montotemp);
+                        }
+                        string mensaje = operation.PagoTarjetaCliente(int.Parse(numtarjeta), monto);
+                        if (mensaje.Equals("ok"))
+                        {
+                            Console.WriteLine("Tarjeta pagada correctamente");
+                        }
+                        else
+                        {
+                            Console.WriteLine(mensaje);
+                        }
+                    }
+                }
+            }
 
             Console.WriteLine();
         }
