@@ -161,7 +161,7 @@ namespace RestWebService
                 else if (request_instance == "cliente")
                 {
                     string cedula_temp = context.Request["cedula"];
-                    if (cedula_temp == null)
+                    if (cedula_temp == null) //si no hay cédula, obtener todos los clientes
                     {
                         List<BancaTec.Cliente> lista_clientes = Cliente.GetClientes();
                         if (lista_clientes.Count == 0)
@@ -176,7 +176,7 @@ namespace RestWebService
                         }
 
                     }
-                    else
+                    else //buscar el cliente por cedula
                     {
                         string _cedula = cedula_temp;
                         clie = Cliente.GetCliente(_cedula);
@@ -198,14 +198,14 @@ namespace RestWebService
                 {
                     string num_temp = context.Request["numcuenta"];
                     string cedCliente_temp = context.Request["cedcliente"];
-                    if (num_temp == null)
+                    if (num_temp == null) //Revisa si hay numero de cuenta
                     {
                         List<BancaTec.Cuenta> lista_cuentas = new List<Cuenta>();
-                        if (cedCliente_temp == null)
+                        if (cedCliente_temp == null) //no hay ni cuenta ni cedula, mostrar todas
                         {
                             lista_cuentas = Cuenta.GetCuentas();
                         }
-                        else
+                        else //buscar cuentas por cliente
                         {
                             lista_cuentas = Cuenta.GetCuentas(cedCliente_temp);
                         }
@@ -213,14 +213,14 @@ namespace RestWebService
                         {
                             WriteResponse("No se encontraron cuentas");
                         }
-                        else
+                        else 
                         {
                             string serializedList = Serialize(lista_cuentas);
                             context.Response.ContentType = "text/xml";
                             WriteResponse(serializedList);
                         }
                     }
-                    else
+                    else //buscar cuenta por numero
                     {
                         int _num = int.Parse(num_temp);
 
@@ -246,15 +246,15 @@ namespace RestWebService
                     string num_prestamo_temp = context.Request["numprestamo"];
                     string ced_cliente_temp = context.Request["cedcliente"];
                     List<BancaTec.Pago> lista_pagos = new List<BancaTec.Pago>();
-                    if (num_prestamo_temp == null && ced_cliente_temp != null)
+                    if (num_prestamo_temp == null && ced_cliente_temp != null) //si hay cedula pero no numero de prestamo
                     {
                         lista_pagos = Pago.GetPagos(ced_cliente_temp, "cliente");
                     }
-                    else if (num_prestamo_temp != null)
+                    else if (num_prestamo_temp != null) //si hay numero de prestamo
                     {
                         lista_pagos = Pago.GetPagos(num_prestamo_temp, "prestamo");
                     }
-                    else
+                    else //buscar todos los pagos
                     {
                         lista_pagos = Pago.GetPagos();
                     }
@@ -626,10 +626,11 @@ namespace RestWebService
         {
             try
             {
+                //se va a checkear con cada if, el tipo de dato que se quiere crear
                 #region Asesor
                 if (request_instance == "asesor")
                 {
-                    BancaTec.Asesor ase = new BancaTec.Asesor
+                    BancaTec.Asesor ase = new BancaTec.Asesor //nuevo asesor a agregar
                     {
                         Cedula = context.Request["cedula"],
                         FechaNac = DateTime.Parse(context.Request["fechanac"]),
@@ -647,7 +648,7 @@ namespace RestWebService
                 #region Cliente
                 else if (request_instance == "cliente")
                 {
-                    BancaTec.Cliente clie = new BancaTec.Cliente
+                    BancaTec.Cliente clie = new BancaTec.Cliente //nuevo cliente a agregar
                     {
                         Nombre = context.Request["nombre"],
                         SegundoNombre = context.Request["segundonombre"],
@@ -668,7 +669,7 @@ namespace RestWebService
                 #region Cuenta
                 else if (request_instance == "cuenta")
                 {
-                    BancaTec.Cuenta cuen = new BancaTec.Cuenta
+                    BancaTec.Cuenta cuen = new BancaTec.Cuenta //nueva cuenta a agregar
                     {
                         Tipo = context.Request["tipo"],
                         Moneda = context.Request["moneda"],
@@ -689,12 +690,12 @@ namespace RestWebService
                 }
                 #endregion
                 #region Pago
-                else if (request_instance == "pago")
+                else if (request_instance == "pago") //pago que se quiere hacer, elegido del calendario de pagos
                 {
                     string cuentatemp = context.Request["cuenta"];
                     string efectivotemp = context.Request["efectivo"];
                     int efectivo;
-                    if (efectivotemp==null)
+                    if (efectivotemp==null) //no se va a pagar en efectivo
                     {
                         efectivo = 0;
                     }
@@ -703,7 +704,7 @@ namespace RestWebService
                         efectivo = 1;
                     }
                     int cuenta;
-                    if (cuentatemp == null && efectivo == 0)
+                    if (cuentatemp == null && efectivo == 0) 
                     {
                         cuenta = -1;
                     }
@@ -712,7 +713,7 @@ namespace RestWebService
                         cuenta = int.Parse(cuentatemp);
                     }
                     int numprestamo = int.Parse(context.Request["numprestamo"]);
-                    if (context.Request["extra"] != null)
+                    if (context.Request["extra"] != null) 
                     {
                         int extra = int.Parse(context.Request["extra"]);
                         string moneda = context.Request["moneda"];
