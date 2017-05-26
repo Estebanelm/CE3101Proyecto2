@@ -4,6 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace BancaTec
 {
+    //Esta clase es utilizada para darle sentido al modelo de Entity Framework.
+    //Los atributos virtuales son las entidades existentes en la base de datos
+    //Context permite hacer operaciones sobre la base de datos de manera rápida
+    //y simple.
+    //Este Context es generado automáticamente utilizando el siguiente comando
+    //en la línea de comandos de Nuget:
+    //Scaffold-DbContext +
+    //"Host=localhost;Database=BancaTec;Username=postgres;Password=bases2017" +
+    //Npgsql.EntityFrameworkCore.PostgreSQL -Force
     public partial class BancaTecContext : DbContext
     {
         public virtual DbSet<Asesor> Asesor { get; set; }
